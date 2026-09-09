@@ -26,3 +26,6 @@ harness = false
 [[bench]]
 name = "cnot_bench"
 harness = false
+
+[dev-dependencies]
+insta = "1.48.0"
