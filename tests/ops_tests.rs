@@ -113,6 +113,38 @@ fn test_apply_gate_inplace() {
 }
 
 #[test]
+fn qubit_zero_is_least_significant_bit() {
+    let mut state = q0_n(3);
+
+    apply_gate_inplace(&mut state, &gate_x(), 0);
+
+    let state = state
+        .into_dimensionality::<ndarray::Ix1>()
+        .expect("State must be a 1D vector");
+
+    let mut expected = Array1::<Complex64>::zeros(8);
+    expected[1] = to_c64(1.0);
+
+    assert_eq!(state, expected);
+}
+
+#[test]
+fn highest_qubit_maps_to_highest_basis_bit() {
+    let mut state = q0_n(3);
+
+    apply_gate_inplace(&mut state, &gate_x(), 2);
+
+    let state = state
+        .into_dimensionality::<ndarray::Ix1>()
+        .expect("State must be a 1D vector");
+
+    let mut expected = Array1::<Complex64>::zeros(8);
+    expected[4] = to_c64(1.0);
+
+    assert_eq!(state, expected);
+}
+
+#[test]
 fn test_apply_cnot_inplace() {
     let state = tensor_product(&q0(), &q0());
 

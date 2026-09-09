@@ -178,3 +178,26 @@ fn run_rejects_measurement_operations() {
     circuit.measure(0, 0);
     circuit.run();
 }
+
+#[test]
+fn phase_oracle_target_index_uses_lsb_qubit_order() {
+    let mut circuit = Circuit::new(3);
+
+    circuit.h(0).h(1).h(2).phase_oracle(1);
+
+    let state = circuit.run();
+    let amplitude = 1.0 / 8.0_f64.sqrt();
+
+    for index in 0..8 {
+        let expected = if index == 1 {
+            Complex64::new(-amplitude, 0.0)
+        } else {
+            Complex64::new(amplitude, 0.0)
+        };
+
+        assert!(
+            (state[index] - expected).norm() < 1e-10,
+            "unexpected amplitude at basis index {index}"
+        );
+    }
+}
