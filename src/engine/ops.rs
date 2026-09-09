@@ -47,6 +47,11 @@ where
 ///
 /// The algorithm identifies and updates pairs of amplitudes (i0, i1)
 /// that correspond to the target qubit's 0 and 1 states.
+///
+/// Qubit indexing is little-endian with respect to state-vector indices:
+/// qubit 0 is the least significant bit. For example, in a 3-qubit system,
+/// applying X to qubit 0 maps |000> to |001> (index 1), while applying X
+/// to qubit 2 maps |000> to |100> (index 4).
 pub fn apply_gate_inplace(state: &mut ArrayD<Complex64>, gate: &Array2<Complex64>, target: usize) {
     let stride = 1 << target;
     let size = state.len();
