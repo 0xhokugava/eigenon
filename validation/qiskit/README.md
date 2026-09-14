@@ -124,6 +124,5 @@ The current OpenQASM exporter does not support:
 * `mcz`
 * custom gates
 * OpenQASM import
-* OpenQASM 3.0
 
 Unsupported operations return an explicit export error instead of generating invalid OpenQASM.

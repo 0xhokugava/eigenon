@@ -1,0 +1,12 @@
+---
+source: tests/openqasm_tests.rs
+expression: qasm
+---
+OPENQASM 3.0;
+include "stdgates.inc";
+
+qubit[2] q;
+bit[3] c;
+
+h q[0];
+c[2] = measure q[0];

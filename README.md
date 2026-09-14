@@ -105,6 +105,29 @@ mcz(controls, target)
 
 Qubit `q0` is the least significant bit and appears as the rightmost bit in printed basis states.
 
+## OpenQASM export
+
+Eigenon supports OpenQASM 2.0 and OpenQASM 3.0 export.
+
+OpenQASM 2.0 is the default:
+
+```bash
+cargo run --quiet -- export-openqasm \
+  --qubits 2 \
+  --gate h:0 \
+  --gate cnot:0,1
+```
+
+Use `--qasm-version 3` to export OpenQASM 3.0:
+
+```bash
+cargo run --quiet -- export-openqasm \
+  --qubits 2 \
+  --gate h:0 \
+  --gate cnot:0,1 \
+  --qasm-version 3
+```
+
 ## Development
 
 Run the test suite:
