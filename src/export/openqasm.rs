@@ -1,5 +1,6 @@
 use crate::circuit::core::Circuit;
-use crate::circuit::operation::{GateKind, Operation};
+use crate::circuit::operation::Operation;
+use crate::export::openqasm_helper::{OpenQasmVersion, write_operations};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,43 +33,25 @@ pub fn export_openqasm2(circuit: &Circuit) -> Result<String, OpenQasmExportError
 
     output.push('\n');
 
-    for operation in circuit.operations() {
-        match operation {
-            Operation::SingleQubit { gate, target } => {
-                output.push_str(&format!("{} q[{}];\n", openqasm_gate_name(*gate), target));
-            }
-
-            Operation::Cnot { control, target } => {
-                output.push_str(&format!("cx q[{}], q[{}];\n", control, target));
-            }
-
-            Operation::Cz { control, target } => {
-                output.push_str(&format!("cz q[{}], q[{}];\n", control, target));
-            }
-
-            Operation::Mcx { .. } | Operation::Mcz { .. } => {
-                return Err(OpenQasmExportError::UnsupportedOperation(operation.clone()));
-            }
-
-            Operation::Measure {
-                qubit,
-                classical_bit,
-            } => {
-                output.push_str(&format!("measure q[{}] -> c[{}];\n", qubit, classical_bit));
-            }
-        }
-    }
+    write_operations(circuit, &mut output, OpenQasmVersion::V2)?;
 
     Ok(output)
 }
 
-fn openqasm_gate_name(gate: GateKind) -> &'static str {
-    match gate {
-        GateKind::X => "x",
-        GateKind::Y => "y",
-        GateKind::Z => "z",
-        GateKind::H => "h",
-        GateKind::S => "s",
-        GateKind::T => "t",
+pub fn export_openqasm3(circuit: &Circuit) -> Result<String, OpenQasmExportError> {
+    let mut output = String::new();
+
+    output.push_str("OPENQASM 3.0;\n");
+    output.push_str("include \"stdgates.inc\";\n\n");
+    output.push_str(&format!("qubit[{}] q;\n", circuit.n_qubits()));
+
+    if circuit.n_classical_bits() > 0 {
+        output.push_str(&format!("bit[{}] c;\n", circuit.n_classical_bits()));
     }
+
+    output.push('\n');
+
+    write_operations(circuit, &mut output, OpenQasmVersion::V3)?;
+
+    Ok(output)
 }

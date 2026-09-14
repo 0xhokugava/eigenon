@@ -2,7 +2,7 @@ use eigenon::circuit::catalog;
 use eigenon::circuit::catalog::BellState;
 use eigenon::circuit::core::Circuit;
 use eigenon::circuit::operation::Operation;
-use eigenon::export::openqasm::{OpenQasmExportError, export_openqasm2};
+use eigenon::export::openqasm::{OpenQasmExportError, export_openqasm2, export_openqasm3};
 
 #[test]
 fn exports_empty_circuit() {
@@ -96,5 +96,12 @@ fn snapshot_explicit_measurement_mapping() {
     let mut circuit = Circuit::with_classical_bits(2, 3);
     circuit.h(0).measure(0, 2);
     let qasm = export_openqasm2(&circuit).unwrap();
+    insta::assert_snapshot!(qasm);
+}
+
+#[test]
+fn snapshot_openqasm3_bell_circuit() {
+    let circuit = catalog::bell(BellState::PhiPlus);
+    let qasm = export_openqasm3(&circuit).unwrap();
     insta::assert_snapshot!(qasm);
 }
