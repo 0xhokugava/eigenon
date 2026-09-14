@@ -1,11 +1,20 @@
 use super::gate_spec::GateSpec;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum OpenQasmVersion {
+    #[value(name = "2")]
+    V2,
+
+    #[value(name = "3")]
+    V3,
 }
 
 #[derive(Subcommand)]
@@ -46,7 +55,7 @@ pub enum Commands {
         #[arg(long = "gate", value_name = "GATE")]
         gates: Vec<GateSpec>,
     },
-    /// Export a quantum circuit to OpenQASM 2.0
+    /// Export a quantum circuit to OpenQASM
     #[command(name = "export-openqasm")]
     ExportOpenqasm {
         #[arg(short, long)]
@@ -54,5 +63,8 @@ pub enum Commands {
 
         #[arg(long = "gate", value_name = "GATE")]
         gates: Vec<GateSpec>,
+
+        #[arg(long = "qasm-version", value_enum, default_value_t = OpenQasmVersion::V2)]
+        qasm_version: OpenQasmVersion,
     },
 }

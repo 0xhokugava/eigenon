@@ -1,8 +1,8 @@
 use clap::Parser;
 use eigenon::circuit::core::Circuit;
-use eigenon::cli::{Cli, Commands, DemoCommand, VerifyCommand};
+use eigenon::cli::{Cli, Commands, DemoCommand, OpenQasmVersion, VerifyCommand};
 use eigenon::engine::utils::to_dirac;
-use eigenon::export::openqasm::export_openqasm2;
+use eigenon::export::openqasm::{export_openqasm2, export_openqasm3};
 use eigenon::{algorithms, experiments};
 
 fn main() -> Result<(), String> {
@@ -26,7 +26,11 @@ fn main() -> Result<(), String> {
             println!("Qubits: {}, Gates: {:?}", qubits, gates);
             println!("State: {}", to_dirac(&state));
         }
-        Commands::ExportOpenqasm { qubits, gates } => {
+        Commands::ExportOpenqasm {
+            qubits,
+            gates,
+            qasm_version,
+        } => {
             if qubits == 0 {
                 return Err("Circuit must contain at least one qubit".to_string());
             }
@@ -41,7 +45,11 @@ fn main() -> Result<(), String> {
                 gate.apply(&mut circuit);
             }
 
-            let qasm = export_openqasm2(&circuit).map_err(|error| error.to_string())?;
+            let qasm = match qasm_version {
+                OpenQasmVersion::V2 => export_openqasm2(&circuit),
+                OpenQasmVersion::V3 => export_openqasm3(&circuit),
+            }
+            .map_err(|error| error.to_string())?;
 
             println!("{qasm}");
         }
