@@ -95,6 +95,25 @@ The current exporter supports:
 * `t`
 * `cx`
 * `cz`
+* classical registers
+* measurement
+
+Measured circuits are parsed by Qiskit with their classical register and
+qubit-to-classical-bit mapping preserved.
+
+For statevector validation, final measurement operations are removed from a
+copy of the parsed circuit before calling `Statevector.from_instruction()`.
+
+## Qiskit integration tests
+
+Qiskit validation tests are marked as ignored because they require an external
+Python environment with Qiskit installed.
+
+Run them explicitly with:
+
+```bash
+cargo test qiskit_ -- --ignored
+```
 
 ## Not supported yet
 
