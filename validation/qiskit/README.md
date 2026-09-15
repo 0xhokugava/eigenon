@@ -119,7 +119,6 @@ cargo test qiskit_ -- --ignored
 
 The current OpenQASM exporter does not support:
 
-* measurement / classical registers
 * `mcx`
 * `mcz`
 * custom gates

@@ -1,6 +1,6 @@
 use crate::circuit::operation::{GateKind, Operation};
 use crate::engine::constants::{
-    gate_cnot, gate_cz, gate_h, gate_s, gate_t, gate_x, gate_y, gate_z,
+    gate_cnot, gate_cz, gate_h, gate_s, gate_t, gate_x, gate_y, gate_z, identity,
 };
 use crate::engine::ops::{apply_controlled_single_qubit_gate_inplace, apply_k_qubit_gate_inplace};
 use crate::engine::utils::q0_n;
@@ -25,6 +25,7 @@ fn matrix_for_gate(gate: GateKind) -> Array2<Complex64> {
         GateKind::H => gate_h(),
         GateKind::S => gate_s(),
         GateKind::T => gate_t(),
+        GateKind::I => identity(),
     }
 }
 
@@ -181,6 +182,10 @@ impl Circuit {
 
     pub fn t(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::T, target)
+    }
+
+    pub fn i(&mut self, target: usize) -> &mut Self {
+        self.add_single_qubit_gate(GateKind::I, target)
     }
 
     pub fn h_all(&mut self) -> &mut Self {

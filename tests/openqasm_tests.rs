@@ -14,7 +14,7 @@ fn exports_empty_circuit() {
 #[test]
 fn exports_single_qubit_gates() {
     let mut circuit = Circuit::new(1);
-    circuit.h(0).x(0).y(0).z(0).s(0).t(0);
+    circuit.h(0).x(0).y(0).z(0).s(0).t(0).i(0);
     let qasm = export_openqasm2(&circuit).unwrap();
     insta::assert_snapshot!(qasm);
 }
