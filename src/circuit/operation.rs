@@ -7,6 +7,7 @@ pub enum GateKind {
     H,
     S,
     T,
+    I,
 }
 
 /// Semantic circuit operation.

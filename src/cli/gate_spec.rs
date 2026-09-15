@@ -9,6 +9,7 @@ pub enum GateSpec {
     Z(usize),
     S(usize),
     T(usize),
+    I(usize),
     Cnot { control: usize, target: usize },
     Cz { control: usize, target: usize },
     Mcx { controls: Vec<usize>, target: usize },
@@ -24,6 +25,7 @@ impl GateSpec {
             GateSpec::Z(qubit) => circuit.z(*qubit),
             GateSpec::S(qubit) => circuit.s(*qubit),
             GateSpec::T(qubit) => circuit.t(*qubit),
+            GateSpec::I(qubit) => circuit.i(*qubit),
             GateSpec::Cnot { control, target } => circuit.cnot(*control, *target),
             GateSpec::Cz { control, target } => circuit.cz(*control, *target),
             GateSpec::Mcx { controls, target } => circuit.mcx(controls, *target),
@@ -40,7 +42,8 @@ impl GateSpec {
             | GateSpec::Y(qubit)
             | GateSpec::Z(qubit)
             | GateSpec::S(qubit)
-            | GateSpec::T(qubit) => {
+            | GateSpec::T(qubit)
+            | GateSpec::I(qubit) => {
                 validate_qubit(*qubit, n_qubits)?;
             }
             GateSpec::Cnot { control, target } | GateSpec::Cz { control, target } => {
@@ -98,6 +101,7 @@ impl FromStr for GateSpec {
             "z" => Ok(GateSpec::Z(parse_qubit(operands)?)),
             "s" => Ok(GateSpec::S(parse_qubit(operands)?)),
             "t" => Ok(GateSpec::T(parse_qubit(operands)?)),
+            "i" => Ok(GateSpec::I(parse_qubit(operands)?)),
             "cnot" => {
                 let (control, target) = parse_control_target(operands, &gate_name)?;
                 Ok(GateSpec::Cnot { control, target })
@@ -251,6 +255,23 @@ mod tests {
 
         assert_eq!(state[0].norm_sqr(), 0.0);
         assert_eq!(state[1].norm_sqr(), 1.0);
+    }
+
+    #[test]
+    fn parses_i_gate() {
+        let gate: GateSpec = "i:0".parse().unwrap();
+
+        assert_eq!(gate, GateSpec::I(0));
+    }
+
+    #[test]
+    fn applies_i_gate_to_circuit() {
+        let mut circuit = Circuit::new(1);
+        GateSpec::I(0).apply(&mut circuit);
+        let state = circuit.run();
+
+        assert_eq!(state[0].norm_sqr(), 1.0);
+        assert_eq!(state[1].norm_sqr(), 0.0);
     }
 
     #[test]

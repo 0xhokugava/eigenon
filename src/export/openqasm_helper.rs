@@ -56,5 +56,6 @@ fn openqasm_gate_name(gate: GateKind) -> &'static str {
         GateKind::H => "h",
         GateKind::S => "s",
         GateKind::T => "t",
+        GateKind::I => "id",
     }
 }
