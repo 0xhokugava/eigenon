@@ -1,6 +1,6 @@
 # Eigenon
 
-Modular quantum state-vector simulator and circuit execution toolkit focuses on matrix-free state-vector execution, circuit correctness, explicit qubit-ordering conventions and a small understandable API for building and running quantum circuits.
+Quantum state-vector simulator and circuit toolkit focused on matrix-free execution, correctness, explicit qubit-ordering conventions, and interoperability with external quantum tooling.
 
 ## Features
 
