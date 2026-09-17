@@ -2,6 +2,7 @@ use crate::circuit::operation::{GateKind, Operation};
 use crate::engine::constants::{
     gate_cnot, gate_cz, gate_h, gate_s, gate_t, gate_x, gate_y, gate_z, identity,
 };
+use crate::engine::measurement::measure_qubit_inplace;
 use crate::engine::ops::{apply_controlled_single_qubit_gate_inplace, apply_k_qubit_gate_inplace};
 use crate::engine::utils::q0_n;
 use ndarray::{Array2, ArrayD};
@@ -329,7 +330,9 @@ impl Circuit {
     ///
     /// The circuit stores semantic operations. During execution each operation
     /// is mapped to the corresponding matrix or controlled-gate engine call.
-    /// Operations are applied sequentially in insertion order.
+    /// Operations are applied sequentially in insertion order. A `Measure`
+    /// operation collapses the state to the subspace consistent with the
+    /// sampled outcome, per the Born rule.
     pub fn run(&self) -> ArrayD<Complex64> {
         let mut state = q0_n(self.n_qubits);
 
@@ -364,8 +367,8 @@ impl Circuit {
                     );
                 }
 
-                Operation::Measure { .. } => {
-                    panic!("Measurement execution is not supported by Circuit::run yet");
+                Operation::Measure { qubit, .. } => {
+                    measure_qubit_inplace(&mut state, *qubit);
                 }
             }
         }
