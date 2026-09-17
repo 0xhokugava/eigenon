@@ -172,11 +172,50 @@ fn bell_measurement_maps_qubits_to_classical_bits() {
 }
 
 #[test]
-#[should_panic(expected = "Measurement execution is not supported by Circuit::run yet")]
-fn run_rejects_measurement_operations() {
+fn run_collapses_basis_state_on_measurement() {
+    // |1> must always collapse to itself when measured.
+    for _ in 0..100 {
+        let mut circuit = Circuit::with_classical_bits(1, 1);
+        circuit.x(0).measure(0, 0);
+        let state = circuit.run();
+        assert_states_close(&state, &q1().into_dyn());
+    }
+}
+
+#[test]
+fn run_collapses_superposition_to_a_single_basis_state_on_measurement() {
     let mut circuit = Circuit::with_classical_bits(1, 1);
-    circuit.measure(0, 0);
-    circuit.run();
+    circuit.h(0).measure(0, 0);
+    let state = circuit.run();
+
+    let is_q0 = (state[0] - Complex64::new(1.0, 0.0)).norm() < 1e-10 && state[1].norm() < 1e-10;
+    let is_q1 = (state[1] - Complex64::new(1.0, 0.0)).norm() < 1e-10 && state[0].norm() < 1e-10;
+
+    assert!(
+        is_q0 || is_q1,
+        "measured state should collapse to |0> or |1>, got {:?}",
+        state
+    );
+}
+
+#[test]
+fn run_measuring_one_qubit_does_not_disturb_others() {
+    // Bell pair: measuring qubit 0 must leave the pair correlated, so
+    // qubit 1 ends up in whichever basis state qubit 0 collapsed to.
+    for _ in 0..100 {
+        let mut circuit = Circuit::with_classical_bits(2, 2);
+        circuit.h(0).cnot(0, 1).measure(0, 0);
+        let state = circuit.run();
+
+        let collapsed_to_00 = (state[0] - Complex64::new(1.0, 0.0)).norm() < 1e-10;
+        let collapsed_to_11 = (state[3] - Complex64::new(1.0, 0.0)).norm() < 1e-10;
+
+        assert!(
+            collapsed_to_00 || collapsed_to_11,
+            "expected the Bell pair to collapse to |00> or |11>, got {:?}",
+            state
+        );
+    }
 }
 
 #[test]
