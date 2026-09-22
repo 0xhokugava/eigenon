@@ -34,6 +34,25 @@ cargo fmt -- --check
 cargo test
 ```
 
+## Examples
+
+Run the Bell state example:
+
+```bash
+cargo run --example bell
+```
+
+The example creates a two-qubit circuit, applies `H` to qubit `0`, then applies
+`CNOT` with qubit `0` as the control and qubit `1` as the target. It prints:
+
+```text
+Bell state: (0.707 + 0.000i)|00> + (0.707 + 0.000i)|11>
+```
+
+Qubit `0` is the least significant bit and appears as the rightmost bit in
+printed basis states. More runnable examples can be added to the `examples/`
+directory and executed with `cargo run --example <name>`.
+
 ## Command-line interface
 
 Install `eigenon` binary from the repository root:
