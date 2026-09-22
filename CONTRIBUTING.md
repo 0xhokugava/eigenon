@@ -47,6 +47,9 @@ Before starting work:
 * ask for agreement before starting an architectural change or a large feature
 * keep the proposed change focused on one problem
 
+Maintainers use the process in [docs/TRIAGE.md](docs/TRIAGE.md) to classify
+issues and select tasks for `good first issue` and `help wanted`.
+
 Documentation, focused tests, examples, validation cases and small cleanup
 tasks are usually the best starting points.
 

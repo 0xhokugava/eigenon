@@ -178,6 +178,7 @@ full pull request checklist.
 
 * [Architecture and implementation](docs/ARCHITECTURE.md)
 * [Development roadmap](docs/ROADMAP.md)
+* [Issue triage and label policy](docs/TRIAGE.md)
 * [External validation](validation)
 * [Contribution guide](CONTRIBUTING.md)
 

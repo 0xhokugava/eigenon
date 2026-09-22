@@ -1,0 +1,71 @@
+name: Bug report
+description: Report reproducible behavior that appears to be incorrect
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include a minimal reproduction when possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and where did you observe it?
+      placeholder: Describe the incorrect behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide the smallest circuit, CLI command or code sample that reproduces the problem.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What result did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include output, errors or relevant state amplitudes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include your operating system and the output of `rustc --version`.
+      placeholder: |
+        OS: Ubuntu 24.04
+        rustc: rustc 1.xx.x
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add logs, screenshots, related issues or reference-framework results if useful.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched existing issues for duplicates.
+          required: true
+        - label: I removed secrets and private data from the report.
+          required: true

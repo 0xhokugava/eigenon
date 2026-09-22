@@ -1,0 +1,51 @@
+name: Documentation improvement
+description: Report unclear, missing or outdated documentation
+title: "[Docs]: "
+labels:
+  - documentation
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Link the page or provide the repository path and section.
+      placeholder: docs/ARCHITECTURE.md, Qubit Ordering
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear or outdated?
+      description: Explain what a reader cannot understand or which statement no longer matches the code.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: Describe the information, example or correction that should be added.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Primary audience
+      options:
+        - New user
+        - Contributor
+        - Library user
+        - CLI user
+        - Maintainer
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I checked that a newer document does not already answer this question.
+          required: true
