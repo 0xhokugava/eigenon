@@ -8,6 +8,14 @@ use crate::engine::utils::q0_n;
 use ndarray::{Array2, ArrayD};
 use num_complex::Complex64;
 
+/// A quantum circuit containing semantic operations in execution order.
+///
+/// Gate methods add operations and return the same circuit, so calls can be
+/// chained. Calling [`Circuit::run`] starts from `|0...0>` and executes every
+/// scheduled operation.
+///
+/// Qubit `0` is the least significant bit. Controlled gates use
+/// `control, target` argument order.
 pub struct Circuit {
     n_qubits: usize,
     n_classical_bits: usize,
@@ -31,6 +39,11 @@ fn matrix_for_gate(gate: GateKind) -> Array2<Complex64> {
 }
 
 impl Circuit {
+    /// Creates an empty circuit with no classical register.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `n_qubits` is zero.
     pub fn new(n_qubits: usize) -> Self {
         assert!(n_qubits > 0, "Circuit must contain at least one qubit");
         Self {
@@ -40,6 +53,14 @@ impl Circuit {
         }
     }
 
+    /// Creates an empty circuit with an explicitly sized classical register.
+    ///
+    /// The classical register is used by measurement operations and OpenQASM
+    /// export. It may be smaller, equal to or larger than the quantum register.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `n_qubits` is zero.
     pub fn with_classical_bits(n_qubits: usize, n_classical_bits: usize) -> Self {
         assert!(n_qubits > 0, "Circuit must contain at least one qubit");
 
@@ -161,34 +182,70 @@ impl Circuit {
         &self.operations
     }
 
+    /// Adds a Hadamard gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn h(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::H, target)
     }
 
+    /// Adds a Pauli-X gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn x(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::X, target)
     }
 
+    /// Adds a Pauli-Y gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn y(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::Y, target)
     }
 
+    /// Adds a Pauli-Z gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn z(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::Z, target)
     }
 
+    /// Adds an S phase gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn s(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::S, target)
     }
 
+    /// Adds a T phase gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn t(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::T, target)
     }
 
+    /// Adds an identity gate on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target` is outside the quantum register.
     pub fn i(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::I, target)
     }
 
+    /// Adds a Hadamard gate to every qubit in ascending index order.
     pub fn h_all(&mut self) -> &mut Self {
         for qubit in 0..self.n_qubits {
             self.h(qubit);
@@ -197,18 +254,38 @@ impl Circuit {
         self
     }
 
+    /// Adds a controlled-X gate using `control, target` argument order.
+    ///
+    /// # Panics
+    ///
+    /// Panics when either index is outside the quantum register or when
+    /// `control` and `target` are the same qubit.
     pub fn cnot(&mut self, control: usize, target: usize) -> &mut Self {
         self.validate_control_target(control, target);
         self.operations.push(Operation::Cnot { control, target });
         self
     }
 
+    /// Adds a controlled-Z gate using `control, target` argument order.
+    ///
+    /// # Panics
+    ///
+    /// Panics when either index is outside the quantum register or when
+    /// `control` and `target` are the same qubit.
     pub fn cz(&mut self, control: usize, target: usize) -> &mut Self {
         self.validate_control_target(control, target);
         self.operations.push(Operation::Cz { control, target });
         self
     }
 
+    /// Adds a multi-controlled X gate.
+    ///
+    /// The target is flipped only when every qubit in `controls` is `1`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `controls` is empty, an index is outside the quantum
+    /// register, a control is duplicated or the target is also a control.
     pub fn mcx(&mut self, controls: &[usize], target: usize) -> &mut Self {
         self.validate_controls_target(controls, target);
         self.operations.push(Operation::Mcx {
@@ -218,6 +295,14 @@ impl Circuit {
         self
     }
 
+    /// Adds a multi-controlled Z gate.
+    ///
+    /// A phase flip is applied only when every control and the target are `1`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `controls` is empty, an index is outside the quantum
+    /// register, a control is duplicated or the target is also a control.
     pub fn mcz(&mut self, controls: &[usize], target: usize) -> &mut Self {
         self.validate_controls_target(controls, target);
         self.operations.push(Operation::Mcz {
@@ -235,6 +320,11 @@ impl Circuit {
     ///
     /// Qubit indexing follows the simulator convention: qubit 0 is the
     /// least significant bit of `target_index`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `target_index` cannot be represented by the circuit's
+    /// quantum register.
     pub fn phase_oracle(&mut self, target_index: usize) -> &mut Self {
         assert!(
             target_index < (1usize << self.n_qubits),
@@ -284,7 +374,15 @@ impl Circuit {
     ///
     /// Both indices are validated against the circuit's quantum and classical
     /// register sizes. The measurement is stored as a semantic operation and
-    /// is not executed immediately.
+    /// is not executed immediately. The `classical_bit` mapping is preserved
+    /// for operation inspection and OpenQASM export.
+    ///
+    /// [`Circuit::run`] collapses the quantum state when it reaches this
+    /// operation, but it does not return the value of the classical bit.
+    ///
+    /// # Panics
+    ///
+    /// Panics when either index is outside its corresponding register.
     pub fn measure(&mut self, qubit: usize, classical_bit: usize) -> &mut Self {
         assert!(
             qubit < self.n_qubits,
@@ -313,6 +411,11 @@ impl Circuit {
     ///
     /// Requires the classical register to contain at least as many bits
     /// as the quantum register.
+    ///
+    /// # Panics
+    ///
+    /// Panics when the classical register is smaller than the quantum
+    /// register.
     pub fn measure_all(&mut self) -> &mut Self {
         assert!(
             self.n_classical_bits >= self.n_qubits,
@@ -333,6 +436,11 @@ impl Circuit {
     /// Operations are applied sequentially in insertion order. A `Measure`
     /// operation collapses the state to the subspace consistent with the
     /// sampled outcome, per the Born rule.
+    ///
+    /// This method returns only the final quantum state. It does not return a
+    /// classical register. Each call starts again from `|0...0>`, so circuits
+    /// containing measurement operations may produce different final states
+    /// on repeated runs.
     pub fn run(&self) -> ArrayD<Complex64> {
         let mut state = q0_n(self.n_qubits);
 
