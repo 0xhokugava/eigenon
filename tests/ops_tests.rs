@@ -13,7 +13,7 @@ use num_complex::Complex64;
 #[test]
 fn test_tensor_product() {
     let c_array = |re_vals: Vec<f64>| -> Array1<Complex64> {
-        Array1::from_vec(re_vals.into_iter().map(|re| to_c64(re)).collect())
+        Array1::from_vec(re_vals.into_iter().map(to_c64).collect())
     };
     // Test |0> ⊗ |0> = |00> (index 0 is 1.0)
     let res00 = tensor_product(&q0(), &q0())
@@ -92,8 +92,8 @@ fn test_apply_gate_inplace() {
             let mut state_inplace = state.clone();
 
             let full = match target {
-                0 => tensor_product(&identity, &gate),
-                1 => tensor_product(&gate, &identity),
+                0 => tensor_product(&identity, gate),
+                1 => tensor_product(gate, &identity),
                 _ => unreachable!(),
             };
 

@@ -17,8 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
       - name: Check formatting
         run: cargo fmt -- --check
+      - name: Check lints
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --no-deps --all-features
       - name: Build
         run: cargo build --verbose
       - name: Run tests
