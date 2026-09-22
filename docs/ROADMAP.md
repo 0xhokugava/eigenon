@@ -24,38 +24,41 @@
 * [x] Gate-level Grover diffusion built from primitive gates
 * [x] Preserved existing Grover result after gate-level decomposition
 * [x] Qiskit validation for gate-level Grover
+* [x] Source files organized into circuit, CLI, engine and export modules
+* [x] Internal circuit operation representation
+* [x] OpenQASM 2.0 export
+* [x] OpenQASM 3.0 export
+* [x] Classical register and measurement export
+* [x] OpenQASM snapshot tests
 
 ## Current Focus
 
-### Source Module Layout
-
-* [ ] refactor source files into clearer modules
-* [ ] preserve current behavior
-* [ ] keep all tests passing
+* [ ] keep OpenQASM 2.0 and OpenQASM 3.0 output stable
+* [ ] improve contributor documentation and runnable examples
+* [ ] improve validation and circuit reports
+* [ ] keep qubit-ordering conventions explicit across APIs and exporters
 
 ## Next
 
-* [ ] introduce an internal circuit representation
-* [ ] improve validation and circuit reports
-* [ ] add basic OpenQASM export
 * [ ] add basic OpenQASM import
-* [ ] document qubit-ordering conventions more clearly
+* [ ] add circuit operation statistics
+* [ ] add JSON and Markdown CLI reports
+* [ ] run selected Qiskit validation in CI
+* [ ] add parameterized rotation gates
 
 ## Later
 
 * [ ] Qiskit adapter
 * [ ] Braket or PennyLane adapter
-* [ ] parameterized rotation gates
 * [ ] circuit-gradient experiments
 * [ ] memory benchmarks by qubit count
 * [ ] parallel matrix-free execution experiments
 
 ## Current Development Order
 
-1. Controlled and multi-controlled primitives
-2. Gate-level Grover decomposition
-3. Grover validation against Qiskit
-4. Internal circuit representation
-5. Validation reports
-6. OpenQASM support
-7. Initial SDK adapter
+1. Stabilize OpenQASM export and its validation
+2. Improve contributor onboarding and runnable examples
+3. Add circuit statistics and validation reports
+4. Add basic OpenQASM import
+5. Add parameterized rotation gates
+6. Plan additional interoperability adapters

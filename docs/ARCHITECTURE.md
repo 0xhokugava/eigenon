@@ -23,7 +23,9 @@ eigenon run --qubits 2 --gate h:0 --gate cnot:0,1
 
 Circuit API stores quantum operations in execution order and dispatches them to the simulator backend.
 
-```
+```rust
+use eigenon::circuit::core::Circuit;
+
 let mut circuit = Circuit::new(2);
 circuit.h(0).cnot(0, 1);
 let state = circuit.run();
@@ -128,7 +130,17 @@ Current algorithm demonstrations include:
 * Deutsch–Jozsa
 * Grover search
 
-Deutsch–Jozsa has been compared against Qiskit. Grover validation is planned after its gate-level decomposition.
+Deutsch–Jozsa and the gate-level Grover implementation have been compared
+against Qiskit reference circuits.
+
+## Interoperability
+
+The circuit operation representation is shared by execution and export.
+Eigenon currently exports supported circuits as OpenQASM 2.0 or OpenQASM 3.0.
+External Qiskit scripts validate selected algorithms and exported circuits.
+
+OpenQASM import, parameterized gates and additional framework adapters remain
+future work.
 
 ## CLI Gate Representation
 
@@ -150,21 +162,23 @@ apply       → add the operation to Circuit
 ```
 
 ## Project Structure
+
 - `benches/`: Performance benchmarks.
 - `src/algorithms/`: Algorithm-level demos and helpers, including Deutsch, Deutsch-Jozsa and Grover search.
-- `src/engine/`: Matrix-free in-place execution engine for applying gates and phase operations directly to the state vector.
-- `src/circuit.rs`: High-level quantum circuit abstraction.
-- `src/constants.rs`: Quantum gates and basis state definitions.
+- `src/circuit/`: High-level circuit abstraction, operation representation and reusable circuit catalog.
+- `src/cli/`: Command definitions and typed gate specification parsing.
+- `src/engine/`: Matrix-free execution, gate constants, measurement and state-vector utilities.
 - `src/experiments/`: Modular educational and verification experiments.
     - `circuit_demos/`: User-facing demos built with the Circuit API.
     - `engine_verification/`: Low-level verification experiments for in-place execution.
     - `foundations/`: Educational examples for tensor products and basic concepts.
+- `src/export/`: OpenQASM 2.0 and OpenQASM 3.0 exporters.
 - `src/lib.rs`: Quantum simulator library.
-- `src/main.rs`: Entry point for running experiments.
-- `src/measurement.rs`: Shot-based measurement simulation.
-- `src/ops.rs`: Core mathematical and state-vector operations.
-- `src/utils.rs`: Formatting, helpers, and state comparison utilities.
+- `src/main.rs`: CLI entry point for circuits, demos, verification and export.
 - `tests/`: Integration tests.
+- `tests/snapshots/`: Stable OpenQASM output snapshots.
 - `validation/`: External validation scripts and notes for comparing simulator behavior against reference frameworks such as Qiskit.
 
-Architecture will evolve gradually as the project adds an internal circuit representation and interoperability support.
+The current design intentionally keeps the circuit representation simple. More
+general intermediate representations, optimization passes and additional
+backends should be introduced only when a concrete use case requires them.

@@ -16,6 +16,23 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Dense matrix baseline for correctness verification
 * Criterion benchmarks
 * Command-line interface for custom circuits, demos and verification
+* OpenQASM 2.0 and OpenQASM 3.0 export
+
+## Quick start
+
+Eigenon requires Git and a stable Rust toolchain with Rust 2024 edition
+support. Rust 1.85 or newer supports this edition. CI follows the latest stable
+toolchain, so the project does not currently guarantee a separate minimum
+supported Rust version.
+
+Clone the repository and run its default checks:
+
+```bash
+git clone https://github.com/0xhokugava/eigenon.git
+cd eigenon
+cargo fmt -- --check
+cargo test
+```
 
 ## Command-line interface
 
@@ -89,10 +106,15 @@ cargo install --path . --force
 
 ## Circuit API
 
-```
+```rust
+use eigenon::circuit::core::Circuit;
+use eigenon::engine::utils::to_dirac;
+
 let mut circuit = Circuit::new(2);
 circuit.h(0).cnot(0, 1);
 let state = circuit.run();
+
+println!("{}", to_dirac(&state));
 ```
 
 The public convention for controlled gates is:
@@ -143,17 +165,21 @@ Run benchmarks:
 cargo bench
 ```
 
-Format the project:
+Check formatting without changing files:
 
 ```bash
-cargo fmt
+cargo fmt -- --check
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and the
+full pull request checklist.
 
 ## Documentation
 
 * [Architecture and implementation](docs/ARCHITECTURE.md)
 * [Development roadmap](docs/ROADMAP.md)
 * [External validation](validation)
+* [Contribution guide](CONTRIBUTING.md)
 
 ## License
 
