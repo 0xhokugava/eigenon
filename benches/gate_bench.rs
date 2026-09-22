@@ -28,7 +28,8 @@ fn bench_single_gate(c: &mut Criterion) {
         group.bench_with_input(BenchmarkId::new("in-place", n), &n, |b, _| {
             b.iter(|| {
                 let mut state_inplace = state.clone();
-                black_box(apply_gate_inplace(&mut state_inplace, &gate, target))
+                apply_gate_inplace(&mut state_inplace, &gate, target);
+                black_box(state_inplace)
             })
         });
     }

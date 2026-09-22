@@ -1,3 +1,3 @@
-mod cli;
+mod commands;
 mod gate_spec;
-pub use cli::*;
+pub use commands::*;
