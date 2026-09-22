@@ -1,0 +1,65 @@
+name: Feature request
+description: Propose a focused capability or improvement
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Explain the use case before proposing an implementation. Large features may require design discussion before work begins.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What workflow, circuit or interoperability need is currently difficult or impossible?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the public behavior you would like Eigenon to provide.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example
+      description: Show a possible Rust API, CLI command, OpenQASM flow or expected output.
+      render: rust
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe workarounds or smaller alternatives you considered.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Circuit API
+        - Simulation engine
+        - CLI
+        - OpenQASM and interoperability
+        - Algorithms and experiments
+        - Testing and validation
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched existing issues and the roadmap for related work.
+          required: true
+        - label: I described the user-facing need, not only an implementation idea.
+          required: true
