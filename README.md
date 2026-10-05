@@ -18,6 +18,13 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Command-line interface for custom circuits, demos and verification
 * OpenQASM 2.0 and OpenQASM 3.0 export
 
+## Contributing
+
+Contributions are welcome. Browse the prepared
+[good first issues](https://github.com/0xhokugava/eigenon/contribute) or read
+[CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, required
+checks and project conventions.
+
 ## Quick start
 
 Eigenon requires Git and a stable Rust toolchain with Rust 2024 edition
@@ -190,8 +197,8 @@ Check formatting without changing files:
 cargo fmt -- --check
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and the
-full pull request checklist.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow, all
+required CI checks and the full pull request checklist.
 
 ## Documentation
 

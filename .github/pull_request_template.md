@@ -17,6 +17,8 @@ List the commands you ran and their results.
 
 ```text
 cargo fmt -- --check
+cargo clippy --all-targets --all-features -- -D warnings
+RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test
 ```
 
@@ -24,6 +26,8 @@ cargo test
 
 - [ ] The change is focused and does not mix unrelated refactors.
 - [ ] Formatting passes with `cargo fmt -- --check`.
+- [ ] Clippy passes with warnings denied.
+- [ ] Documentation builds with rustdoc warnings denied.
 - [ ] Tests pass with `cargo test`.
 - [ ] Behavior changes include tests when possible.
 - [ ] Public behavior and commands are documented.

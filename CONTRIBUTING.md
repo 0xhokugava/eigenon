@@ -77,6 +77,8 @@ Run these commands from the repository root:
 
 ```bash
 cargo fmt -- --check
+cargo clippy --all-targets --all-features -- -D warnings
+RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test
 ```
 
@@ -95,6 +97,8 @@ standalone validation commands and the scripts they execute.
 Please make sure:
 
 * `cargo fmt -- --check` passes
+* `cargo clippy --all-targets --all-features -- -D warnings` passes
+* `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features` passes
 * `cargo test` passes
 * the change is focused and does not mix unrelated refactors
 * behavior changes are covered by tests when possible
