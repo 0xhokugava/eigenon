@@ -139,6 +139,10 @@ The circuit operation representation is shared by execution and export.
 Eigenon currently exports supported circuits as OpenQASM 2.0 or OpenQASM 3.0.
 External Qiskit scripts validate selected algorithms and exported circuits.
 
+OpenQASM 2.0 lowers MCX and MCZ operations with up to two controls to its
+standard gate set. OpenQASM 3.0 preserves arbitrary multi-control operations
+with the `ctrl(n) @` modifier.
+
 OpenQASM import, parameterized gates and additional framework adapters remain
 future work.
 

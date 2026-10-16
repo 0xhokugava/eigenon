@@ -27,8 +27,12 @@ pub fn write_operations(
                 output.push_str(&format!("cz q[{}], q[{}];\n", control, target));
             }
 
-            Operation::Mcx { .. } | Operation::Mcz { .. } => {
-                return Err(OpenQasmExportError::UnsupportedOperation(operation.clone()));
+            Operation::Mcx { controls, target } => {
+                write_multi_controlled_gate(output, version, operation, "x", controls, *target)?;
+            }
+
+            Operation::Mcz { controls, target } => {
+                write_multi_controlled_gate(output, version, operation, "z", controls, *target)?;
             }
 
             Operation::Measure {
@@ -46,6 +50,71 @@ pub fn write_operations(
     }
 
     Ok(())
+}
+
+fn write_multi_controlled_gate(
+    output: &mut String,
+    version: OpenQasmVersion,
+    operation: &Operation,
+    gate: &str,
+    controls: &[usize],
+    target: usize,
+) -> Result<(), OpenQasmExportError> {
+    match version {
+        OpenQasmVersion::V2 => {
+            write_openqasm2_multi_controlled_gate(output, operation, gate, controls, target)
+        }
+        OpenQasmVersion::V3 => {
+            let modifier = if controls.len() == 1 {
+                "ctrl".to_string()
+            } else {
+                format!("ctrl({})", controls.len())
+            };
+            let operands = qasm_operands(controls, target);
+            output.push_str(&format!("{modifier} @ {gate} {operands};\n"));
+            Ok(())
+        }
+    }
+}
+
+fn write_openqasm2_multi_controlled_gate(
+    output: &mut String,
+    operation: &Operation,
+    gate: &str,
+    controls: &[usize],
+    target: usize,
+) -> Result<(), OpenQasmExportError> {
+    match (gate, controls) {
+        ("x", [control]) => {
+            output.push_str(&format!("cx q[{control}], q[{target}];\n"));
+        }
+        ("z", [control]) => {
+            output.push_str(&format!("cz q[{control}], q[{target}];\n"));
+        }
+        ("x", [first, second]) => {
+            output.push_str(&format!("ccx q[{first}], q[{second}], q[{target}];\n"));
+        }
+        ("z", [first, second]) => {
+            output.push_str(&format!("h q[{target}];\n"));
+            output.push_str(&format!("ccx q[{first}], q[{second}], q[{target}];\n"));
+            output.push_str(&format!("h q[{target}];\n"));
+        }
+        _ => {
+            return Err(OpenQasmExportError::UnsupportedOperation(operation.clone()));
+        }
+    }
+
+    Ok(())
+}
+
+fn qasm_operands(controls: &[usize], target: usize) -> String {
+    controls
+        .iter()
+        .copied()
+        .chain(std::iter::once(target))
+        .map(|qubit| format!("q[{qubit}]"))
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 fn openqasm_gate_name(gate: GateKind) -> &'static str {
