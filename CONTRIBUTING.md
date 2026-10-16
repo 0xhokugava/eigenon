@@ -82,10 +82,13 @@ RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test
 ```
 
-The Qiskit integration tests are optional because they require an external
-Python environment:
+CI also runs the Qiskit integration tests. To run the same validation locally,
+install the pinned Python dependency in a virtual environment:
 
 ```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --requirement validation/qiskit/requirements.txt
 cargo test qiskit_ -- --ignored
 ```
 

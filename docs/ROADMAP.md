@@ -30,6 +30,7 @@
 * [x] OpenQASM 3.0 export
 * [x] Classical register and measurement export
 * [x] OpenQASM snapshot tests
+* [x] Selected Qiskit validation in CI
 
 ## Current Focus
 
@@ -43,7 +44,6 @@
 * [ ] add basic OpenQASM import
 * [ ] add circuit operation statistics
 * [ ] add JSON and Markdown CLI reports
-* [ ] run selected Qiskit validation in CI
 * [ ] add parameterized rotation gates
 
 ## Later

@@ -106,12 +106,18 @@ copy of the parsed circuit before calling `Statevector.from_instruction()`.
 
 ## Qiskit integration tests
 
-Qiskit validation tests are marked as ignored because they require an external
-Python environment with Qiskit installed.
+Qiskit validation tests are marked as ignored by the default Rust test suite
+because they require an external Python environment. CI installs the pinned
+dependency from `validation/qiskit/requirements.txt` and runs these tests
+explicitly.
 
-Run them explicitly with:
+Create a local virtual environment, install the same dependency as CI and run
+the tests explicitly with:
 
 ```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --requirement validation/qiskit/requirements.txt
 cargo test qiskit_ -- --ignored
 ```
 
