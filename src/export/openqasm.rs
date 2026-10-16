@@ -10,9 +10,13 @@
 //! single-qubit gates, plus CNOT, CZ and measurement operations. A classical
 //! register is emitted only when the circuit declares classical bits.
 //!
-//! MCX and MCZ operations return
-//! [`OpenQasmExportError::UnsupportedOperation`]. The circuit model does not
-//! currently represent custom or parameterized gates.
+//! OpenQASM 2.0 exports one- and two-control MCX/MCZ operations using `cx`,
+//! `cz`, `ccx` and an H/CCX/H decomposition. Operations with more than two
+//! controls return [`OpenQasmExportError::UnsupportedOperation`] because they
+//! require an explicit ancilla and decomposition policy. OpenQASM 3.0 exports
+//! any supported control count with the standard `ctrl(n) @` modifier.
+//! The circuit model does not currently represent custom or parameterized
+//! gates.
 
 use crate::circuit::core::Circuit;
 use crate::circuit::operation::Operation;
@@ -62,7 +66,7 @@ impl std::error::Error for OpenQasmExportError {}
 /// # Errors
 ///
 /// Returns [`OpenQasmExportError::UnsupportedOperation`] when the circuit
-/// contains an operation that the OpenQASM 2.0 exporter cannot represent.
+/// contains an MCX or MCZ operation with more than two controls.
 pub fn export_openqasm2(circuit: &Circuit) -> Result<String, OpenQasmExportError> {
     let mut output = String::new();
 
@@ -86,10 +90,6 @@ pub fn export_openqasm2(circuit: &Circuit) -> Result<String, OpenQasmExportError
 /// The output includes `stdgates.inc`, a qubit register and a classical bit
 /// register when the circuit uses classical bits.
 ///
-/// # Errors
-///
-/// Returns [`OpenQasmExportError::UnsupportedOperation`] when the circuit
-/// contains an operation that the OpenQASM 3.0 exporter cannot represent.
 pub fn export_openqasm3(circuit: &Circuit) -> Result<String, OpenQasmExportError> {
     let mut output = String::new();
 

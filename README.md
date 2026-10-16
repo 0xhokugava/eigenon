@@ -177,6 +177,10 @@ cargo run --quiet -- export-openqasm \
   --qasm-version 3
 ```
 
+OpenQASM 2.0 exports MCX and MCZ operations with one or two controls. Two-control
+MCX uses `ccx`, while two-control MCZ is decomposed as H/CCX/H. OpenQASM 3.0
+exports any valid control count with the standard `ctrl(n) @` modifier.
+
 ## Development
 
 Run the test suite:

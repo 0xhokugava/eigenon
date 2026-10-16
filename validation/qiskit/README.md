@@ -66,9 +66,10 @@ python3 validation/qiskit/deutsch_jozsa.py
 python3 validation/qiskit/grover.py
 ```
 
-## OpenQASM 2.0 export validation
+## OpenQASM export validation
 
-Eigenon can export a circuit to OpenQASM 2.0 and validate the exported file with Qiskit.
+Eigenon can export circuits to OpenQASM 2.0 or 3.0 and validate the generated
+file with Qiskit.
 
 Generate a Bell circuit as OpenQASM:
 
@@ -95,8 +96,16 @@ The current exporter supports:
 * `t`
 * `cx`
 * `cz`
+* one-control MCX and MCZ as `cx` and `cz`
+* two-control MCX as `ccx`
+* two-control MCZ decomposed as H/CCX/H
 * classical registers
 * measurement
+
+OpenQASM 2.0 MCX and MCZ operations with more than two controls remain
+unsupported because they require an explicit ancilla and decomposition policy.
+OpenQASM 3.0 exports MCX and MCZ with any valid number of controls using the
+standard `ctrl(n) @` modifier.
 
 Measured circuits are parsed by Qiskit with their classical register and
 qubit-to-classical-bit mapping preserved.
@@ -125,9 +134,8 @@ cargo test qiskit_ -- --ignored
 
 The current OpenQASM exporter does not support:
 
-* `mcx`
-* `mcz`
 * custom gates
 * OpenQASM import
 
-Unsupported operations return an explicit export error instead of generating invalid OpenQASM.
+Unsupported operations return an explicit export error instead of generating
+invalid OpenQASM.

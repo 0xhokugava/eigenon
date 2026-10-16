@@ -31,6 +31,7 @@
 * [x] Classical register and measurement export
 * [x] OpenQASM snapshot tests
 * [x] Selected Qiskit validation in CI
+* [x] MCX and MCZ export (up to two controls in OpenQASM 2.0)
 
 ## Current Focus
 
