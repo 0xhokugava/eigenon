@@ -31,3 +31,12 @@ jobs:
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: validation/qiskit/requirements.txt
+      - name: Install Qiskit validation dependencies
+        run: python -m pip install --requirement validation/qiskit/requirements.txt
+      - name: Run Qiskit validation tests
+        run: cargo test qiskit_ -- --ignored
