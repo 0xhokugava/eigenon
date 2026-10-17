@@ -1,5 +1,6 @@
 use eigenon::circuit::core::Circuit;
 use eigenon::export::openqasm::{OpenQasmExportError, export_openqasm2, export_openqasm3};
+use eigenon::import::openqasm::import_openqasm2;
 use std::fs;
 use std::process::Command;
 
@@ -159,4 +160,27 @@ fn qiskit_preserves_mcz_relative_phase() {
 
     assert!(openqasm3_stdout.contains("A(10101) = 0.707106781187+0.000000000000i"));
     assert!(openqasm3_stdout.contains("A(10111) = -0.707106781187+0.000000000000i"));
+}
+
+#[test]
+#[ignore]
+fn qiskit_validates_openqasm2_import_round_trip() {
+    let source = "OPENQASM 2.0;\n\
+                  include \"qelib1.inc\";\n\
+                  qreg input[3];\n\
+                  creg output[4];\n\
+                  h input[2];\n\
+                  cx input[2], input[0];\n\
+                  ccx input[2], input[0], input[1];\n\
+                  measure input[1] -> output[3];\n";
+
+    let original = validate_with_qiskit("openqasm2_import_source", source);
+    let imported = import_openqasm2(source).unwrap();
+    let exported = export_openqasm2(&imported).unwrap();
+    let round_trip = validate_with_qiskit("openqasm2_import_round_trip", &exported);
+
+    for expected in ["Qubits: 3", "Classical bits: 4", "q[1] -> c[3]"] {
+        assert!(original.contains(expected));
+        assert!(round_trip.contains(expected));
+    }
 }
