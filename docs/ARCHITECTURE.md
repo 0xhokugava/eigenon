@@ -156,6 +156,18 @@ The importer accepts one quantum register, an optional classical register,
 relationships before calling the panic-based `Circuit` builder API. Unsupported
 features return source-located errors instead of being ignored.
 
+The `import-openqasm --file <FILE>` CLI command owns file-system access and
+passes the loaded string into the importer. After a successful import it runs
+the resulting circuit and prints its register counts, operation count and final
+state. Keeping file access outside the parser allows the library API to remain
+usable with in-memory or externally supplied OpenQASM source.
+
+Before parsing as OpenQASM 2.0, the importer recognizes an explicit 3.x version
+and unambiguous headerless OpenQASM 3 markers such as `stdgates.inc`, `qubit`
+and `bit`. These inputs receive a dedicated unsupported-version error instead
+of a misleading OpenQASM 2.0 syntax error. OpenQASM 3 lowering remains outside
+the current importer scope.
+
 Parameterized gates, multiple registers and additional framework adapters
 remain future work.
 

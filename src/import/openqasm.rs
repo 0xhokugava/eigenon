@@ -30,6 +30,13 @@ pub enum OpenQasmImportError {
         /// One-based source column.
         column: usize,
     },
+    /// The source uses OpenQASM 3 syntax, which this importer does not support.
+    UnsupportedOpenQasm3 {
+        /// One-based source line where OpenQASM 3 was identified.
+        line: usize,
+        /// One-based source column where OpenQASM 3 was identified.
+        column: usize,
+    },
     /// The source requests an include other than `qelib1.inc`.
     UnsupportedInclude {
         /// Included path found in the source.
@@ -85,6 +92,10 @@ impl fmt::Display for OpenQasmImportError {
             } => write!(
                 f,
                 "unsupported OpenQASM version `{version}` at {line}:{column}; expected 2.0"
+            ),
+            Self::UnsupportedOpenQasm3 { line, column } => write!(
+                f,
+                "OpenQASM 3 import is not supported yet at {line}:{column}; current importer supports only the OpenQASM 2.0 subset"
             ),
             Self::UnsupportedInclude { path, line, column } => write!(
                 f,
@@ -436,6 +447,12 @@ impl Parser {
         }
 
         let version = self.expect_number("OpenQASM version")?;
+        if is_openqasm3_version(&version.0) {
+            return Err(OpenQasmImportError::UnsupportedOpenQasm3 {
+                line: version.1.line,
+                column: version.1.column,
+            });
+        }
         if version.0 != "2.0" {
             return Err(OpenQasmImportError::UnsupportedVersion {
                 version: version.0,
@@ -740,8 +757,51 @@ enum LoweredOperation {
 /// ```
 pub fn import_openqasm2(source: &str) -> Result<Circuit, OpenQasmImportError> {
     let tokens = Lexer::new(source).tokenize()?;
+    if let Some(location) = inferred_openqasm3_location(&tokens) {
+        return Err(OpenQasmImportError::UnsupportedOpenQasm3 {
+            line: location.line,
+            column: location.column,
+        });
+    }
     let program = Parser::new(tokens).parse()?;
     lower_program(program)
+}
+
+fn is_openqasm3_version(version: &str) -> bool {
+    version.split('.').next() == Some("3")
+}
+
+fn inferred_openqasm3_location(tokens: &[Token]) -> Option<Location> {
+    if matches!(
+        tokens.first().map(|token| &token.kind),
+        Some(TokenKind::Identifier(identifier)) if identifier == "OPENQASM"
+    ) {
+        return None;
+    }
+
+    for (index, token) in tokens.iter().enumerate() {
+        let TokenKind::Identifier(identifier) = &token.kind else {
+            continue;
+        };
+
+        if matches!(
+            identifier.as_str(),
+            "qubit" | "bit" | "uint" | "int" | "float" | "angle" | "bool" | "const" | "let"
+        ) {
+            return Some(token.location);
+        }
+
+        if identifier == "include"
+            && matches!(
+                tokens.get(index + 1).map(|next| &next.kind),
+                Some(TokenKind::StringLiteral(path)) if path == "stdgates.inc"
+            )
+        {
+            return Some(token.location);
+        }
+    }
+
+    None
 }
 
 fn lower_program(program: Program) -> Result<Circuit, OpenQasmImportError> {

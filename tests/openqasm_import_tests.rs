@@ -175,11 +175,10 @@ fn decomposed_mcz_round_trip_preserves_statevector() {
 fn rejects_unsupported_version_and_include() {
     assert!(matches!(
         import_openqasm2("OPENQASM 3.0;"),
-        Err(OpenQasmImportError::UnsupportedVersion {
-            version,
+        Err(OpenQasmImportError::UnsupportedOpenQasm3 {
             line: 1,
             column: 10,
-        }) if version == "3.0"
+        })
     ));
 
     assert!(matches!(
@@ -189,6 +188,16 @@ fn rejects_unsupported_version_and_include() {
             line: 1,
             column: 15,
         }) if path == "stdgates.inc"
+    ));
+}
+
+#[test]
+fn identifies_official_headerless_openqasm3_example() {
+    let source = include_str!("fixtures/openqasm3/inverseqft1.qasm");
+
+    assert!(matches!(
+        import_openqasm2(source),
+        Err(OpenQasmImportError::UnsupportedOpenQasm3 { line: 2, column: 1 })
     ));
 }
 
