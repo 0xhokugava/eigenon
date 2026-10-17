@@ -3,7 +3,9 @@ use eigenon::circuit::core::Circuit;
 use eigenon::cli::{Cli, Commands, DemoCommand, OpenQasmVersion, VerifyCommand};
 use eigenon::engine::utils::to_dirac;
 use eigenon::export::openqasm::{export_openqasm2, export_openqasm3};
+use eigenon::import::openqasm::import_openqasm2;
 use eigenon::{algorithms, experiments};
+use std::fs;
 
 fn main() -> Result<(), String> {
     let cli = Cli::parse();
@@ -52,6 +54,22 @@ fn main() -> Result<(), String> {
             .map_err(|error| error.to_string())?;
 
             println!("{qasm}");
+        }
+        Commands::ImportOpenqasm { file } => {
+            let source = fs::read_to_string(&file).map_err(|error| {
+                format!("Failed to read OpenQASM file `{}`: {error}", file.display())
+            })?;
+            let circuit = import_openqasm2(&source).map_err(|error| error.to_string())?;
+            let state = circuit.run();
+
+            println!("Imported OpenQASM 2.0: {}", file.display());
+            println!(
+                "Qubits: {}, Classical bits: {}, Operations: {}",
+                circuit.n_qubits(),
+                circuit.n_classical_bits(),
+                circuit.operations().len()
+            );
+            println!("State: {}", to_dirac(&state));
         }
         Commands::Demo { command } => match command {
             DemoCommand::All => experiments::run_all_demos(),

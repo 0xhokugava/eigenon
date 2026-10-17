@@ -1,5 +1,6 @@
 use super::gate_spec::GateSpec;
 use clap::{Parser, Subcommand, ValueEnum};
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -66,5 +67,12 @@ pub enum Commands {
 
         #[arg(long = "qasm-version", value_enum, default_value_t = OpenQasmVersion::V2)]
         qasm_version: OpenQasmVersion,
+    },
+    /// Import and execute an OpenQASM 2.0 circuit
+    #[command(name = "import-openqasm")]
+    ImportOpenqasm {
+        /// OpenQASM 2.0 source file
+        #[arg(short, long, value_name = "FILE")]
+        file: PathBuf,
     },
 }

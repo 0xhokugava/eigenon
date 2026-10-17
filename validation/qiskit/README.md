@@ -110,6 +110,10 @@ standard `ctrl(n) @` modifier.
 Measured circuits are parsed by Qiskit with their classical register and
 qubit-to-classical-bit mapping preserved.
 
+The ignored Rust integration suite also imports an external OpenQASM 2.0
+program into Eigenon, exports the resulting circuit again, and asks Qiskit to
+validate both the original and round-tripped forms.
+
 For statevector validation, final measurement operations are removed from a
 copy of the parsed circuit before calling `Statevector.from_instruction()`.
 
@@ -135,7 +139,6 @@ cargo test qiskit_ -- --ignored
 The current OpenQASM exporter does not support:
 
 * custom gates
-* OpenQASM import
 
 Unsupported operations return an explicit export error instead of generating
 invalid OpenQASM.

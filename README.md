@@ -16,7 +16,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Dense matrix baseline for correctness verification
 * Criterion benchmarks
 * Command-line interface for custom circuits, demos and verification
-* OpenQASM 2.0 and OpenQASM 3.0 export
+* OpenQASM 2.0 import and OpenQASM 2.0/OpenQASM 3.0 export
 
 ## Contributing
 
@@ -82,6 +82,17 @@ Output:
 Qubits: 2, Gates: [H(0), Cnot { control: 0, target: 1 }]
 State: (0.707 + 0.000i)|00> + (0.707 + 0.000i)|11>
 ```
+
+Import and execute an OpenQASM 2.0 file:
+
+```bash
+eigenon import-openqasm --file circuit.qasm
+```
+
+The command reports the imported register and operation counts, then prints the
+final state using the same qubit-ordering convention as `eigenon run`. OpenQASM
+3 input is identified and rejected with a dedicated unsupported-version error;
+it is not reported as malformed OpenQASM 2 input.
 
 Supported gate syntax:
 
@@ -180,6 +191,31 @@ cargo run --quiet -- export-openqasm \
 OpenQASM 2.0 exports MCX and MCZ operations with one or two controls. Two-control
 MCX uses `ccx`, while two-control MCZ is decomposed as H/CCX/H. OpenQASM 3.0
 exports any valid control count with the standard `ctrl(n) @` modifier.
+
+## OpenQASM import
+
+Import supported OpenQASM 2.0 source through the library API when the source is
+already available as a string:
+
+```rust
+use eigenon::import::openqasm::import_openqasm2;
+
+let source = r#"OPENQASM 2.0;
+include "qelib1.inc";
+qreg q[2];
+h q[0];
+cx q[0], q[1];
+"#;
+
+let circuit = import_openqasm2(source).unwrap();
+assert_eq!(circuit.n_qubits(), 2);
+```
+
+The importer supports one quantum register, an optional classical register,
+indexed measurements, `id`, `x`, `y`, `z`, `h`, `s`, and `t`, plus `CX`, `cx`,
+`cz`, and `ccx`. Parameterized and custom gates,
+whole-register operations, control flow, reset, barriers, and multiple
+registers return explicit errors. OpenQASM 3 import is not currently supported.
 
 ## Development
 

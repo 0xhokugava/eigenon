@@ -135,16 +135,41 @@ against Qiskit reference circuits.
 
 ## Interoperability
 
-The circuit operation representation is shared by execution and export.
-Eigenon currently exports supported circuits as OpenQASM 2.0 or OpenQASM 3.0.
-External Qiskit scripts validate selected algorithms and exported circuits.
+The circuit operation representation is shared by execution, import and export.
+Eigenon imports a supported OpenQASM 2.0 subset and exports supported circuits
+as OpenQASM 2.0 or OpenQASM 3.0. External Qiskit scripts validate selected
+algorithms and OpenQASM interoperability.
 
 OpenQASM 2.0 lowers MCX and MCZ operations with up to two controls to its
 standard gate set. OpenQASM 3.0 preserves arbitrary multi-control operations
 with the `ctrl(n) @` modifier.
 
-OpenQASM import, parameterized gates and additional framework adapters remain
-future work.
+OpenQASM 2.0 import has three stages:
+
+```text
+source text → tokens and syntax tree → semantic validation → Circuit operations
+```
+
+The importer accepts one quantum register, an optional classical register,
+`qelib1.inc`, fixed gates represented by `GateKind`, controlled gates through
+`ccx`, and indexed measurements. It validates all indices and operand
+relationships before calling the panic-based `Circuit` builder API. Unsupported
+features return source-located errors instead of being ignored.
+
+The `import-openqasm --file <FILE>` CLI command owns file-system access and
+passes the loaded string into the importer. After a successful import it runs
+the resulting circuit and prints its register counts, operation count and final
+state. Keeping file access outside the parser allows the library API to remain
+usable with in-memory or externally supplied OpenQASM source.
+
+Before parsing as OpenQASM 2.0, the importer recognizes an explicit 3.x version
+and unambiguous headerless OpenQASM 3 markers such as `stdgates.inc`, `qubit`
+and `bit`. These inputs receive a dedicated unsupported-version error instead
+of a misleading OpenQASM 2.0 syntax error. OpenQASM 3 lowering remains outside
+the current importer scope.
+
+Parameterized gates, multiple registers and additional framework adapters
+remain future work.
 
 ## CLI Gate Representation
 
@@ -177,6 +202,7 @@ apply       → add the operation to Circuit
     - `engine_verification/`: Low-level verification experiments for in-place execution.
     - `foundations/`: Educational examples for tensor products and basic concepts.
 - `src/export/`: OpenQASM 2.0 and OpenQASM 3.0 exporters.
+- `src/import/`: OpenQASM 2.0 parsing, validation and circuit lowering.
 - `src/lib.rs`: Quantum simulator library.
 - `src/main.rs`: CLI entry point for circuits, demos, verification and export.
 - `tests/`: Integration tests.

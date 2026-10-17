@@ -32,6 +32,7 @@
 * [x] OpenQASM snapshot tests
 * [x] Selected Qiskit validation in CI
 * [x] MCX and MCZ export (up to two controls in OpenQASM 2.0)
+* [x] Basic OpenQASM 2.0 import
 
 ## Current Focus
 
@@ -42,7 +43,6 @@
 
 ## Next
 
-* [ ] add basic OpenQASM import
 * [ ] add circuit operation statistics
 * [ ] add JSON and Markdown CLI reports
 * [ ] add parameterized rotation gates
@@ -60,6 +60,5 @@
 1. Stabilize OpenQASM export and its validation
 2. Improve contributor onboarding and runnable examples
 3. Add circuit statistics and validation reports
-4. Add basic OpenQASM import
-5. Add parameterized rotation gates
-6. Plan additional interoperability adapters
+4. Add parameterized rotation gates
+5. Plan additional interoperability adapters
