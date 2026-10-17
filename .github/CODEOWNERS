@@ -1,0 +1,17 @@
+# Eigenon currently has one maintainer. These ownership declarations route
+# review requests but are not configured as a mandatory second-party approval.
+* @0xhokugava
+
+# Repository automation and ownership policy
+/.github/ @0xhokugava
+/.github/workflows/ @0xhokugava
+/.github/CODEOWNERS @0xhokugava
+
+# Rust dependency and toolchain policy
+/Cargo.toml @0xhokugava
+/Cargo.lock @0xhokugava
+/rust-toolchain* @0xhokugava
+
+# Build and release entry points, if added
+/build.rs @0xhokugava
+/scripts/ @0xhokugava

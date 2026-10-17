@@ -8,6 +8,7 @@ body:
     attributes:
       value: |
         Thanks for reporting a problem. Please include a minimal reproduction when possible.
+        Do not disclose a suspected vulnerability here. Use the private reporting link in SECURITY.md instead.
 
   - type: textarea
     id: description

@@ -1,0 +1,30 @@
+name: Security audit
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_AUDIT_VERSION: "0.22.2"
+
+jobs:
+  cargo-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked --version "$CARGO_AUDIT_VERSION"
+      - name: Audit Cargo.lock against the RustSec advisory database
+        run: cargo audit
+
+# cargo-deny protects dependency policy on every change in the Rust workflow.
+# This scheduled cargo-audit run independently catches advisories published
+# after the last repository change without giving the job write permissions.
