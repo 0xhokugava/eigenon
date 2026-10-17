@@ -20,6 +20,7 @@ cargo fmt -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test
+cargo deny check advisories bans licenses sources
 ```
 
 ## Checklist
@@ -29,6 +30,9 @@ cargo test
 - [ ] Clippy passes with warnings denied.
 - [ ] Documentation builds with rustdoc warnings denied.
 - [ ] Tests pass with `cargo test`.
+- [ ] Dependency policy passes with `cargo deny`.
 - [ ] Behavior changes include tests when possible.
 - [ ] Public behavior and commands are documented.
 - [ ] Qubit-ordering conventions remain explicit where relevant.
+- [ ] New or changed GitHub Actions are pinned to full commit SHAs.
+- [ ] Dependency changes are intentional and `Cargo.lock` is updated.

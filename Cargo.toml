@@ -13,7 +13,7 @@ clap = { version = "4.6.1", features = ["derive"] }
 criterion = { version = "0.8.2", features = ["html_reports"] }
 ndarray = "0.17.2"
 num-complex = "0.4.6"
-rand = "0.10.0"
+rand = "0.10.1"
 
 [[bench]]
 name = "sim_bench"

@@ -1,6 +1,5 @@
 /target
 .idea/
-Cargo.lock
 .venv/
 **/.venv/
 /tmp

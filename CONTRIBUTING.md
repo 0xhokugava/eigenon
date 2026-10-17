@@ -80,6 +80,13 @@ cargo fmt -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test
+cargo deny check advisories bans licenses sources
+```
+
+Install the dependency-policy tool with the same pinned version used in CI:
+
+```bash
+cargo install cargo-deny --locked --version 0.20.2
 ```
 
 CI also runs the Qiskit integration tests. To run the same validation locally,
@@ -103,6 +110,7 @@ Please make sure:
 * `cargo clippy --all-targets --all-features -- -D warnings` passes
 * `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features` passes
 * `cargo test` passes
+* `cargo deny check advisories bans licenses sources` passes
 * the change is focused and does not mix unrelated refactors
 * behavior changes are covered by tests when possible
 * documentation is updated when public behavior or commands change
@@ -129,3 +137,8 @@ Good starting points are usually:
 
 For larger changes, please open an issue first and wait for agreement on the
 scope.
+
+## Security reports
+
+Do not report suspected vulnerabilities in a public issue. Follow
+[SECURITY.md](SECURITY.md) and use GitHub private vulnerability reporting.
