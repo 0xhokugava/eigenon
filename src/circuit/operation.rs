@@ -1,5 +1,5 @@
 /// Built-in single-qubit gate kinds supported by the Circuit API.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GateKind {
     /// Pauli-X gate.
     X,
@@ -15,6 +15,15 @@ pub enum GateKind {
     T,
     /// Identity gate.
     I,
+    /// Rotation around the X axis by an angle in radians.
+    Rx(f64),
+    /// Rotation around the Y axis by an angle in radians.
+    Ry(f64),
+    /// Rotation around the Z axis by an angle in radians.
+    Rz(f64),
+    /// Universal single-qubit gate using OpenQASM's theta, phi and lambda
+    /// angle convention, in radians.
+    U { theta: f64, phi: f64, lambda: f64 },
 }
 
 /// Semantic circuit operation.
@@ -22,7 +31,7 @@ pub enum GateKind {
 /// This representation preserves gate identity, which is required for
 /// export formats such as OpenQASM. Execution code maps these operations
 /// to matrices only when the circuit is run.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Operation {
     /// A built-in single-qubit gate and its target.
     SingleQubit { gate: GateKind, target: usize },

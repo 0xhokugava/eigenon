@@ -20,6 +20,41 @@ fn exports_single_qubit_gates() {
 }
 
 #[test]
+fn openqasm2_exports_parameterized_gates() {
+    let mut circuit = Circuit::new(1);
+    circuit
+        .rx(0.5, 0)
+        .ry(-0.25, 0)
+        .rz(1.125, 0)
+        .u(0.1, 0.2, -0.3, 0);
+
+    let qasm = export_openqasm2(&circuit).unwrap();
+
+    assert!(qasm.contains("rx(0.5) q[0];"));
+    assert!(qasm.contains("ry(-0.25) q[0];"));
+    assert!(qasm.contains("rz(1.125) q[0];"));
+    assert!(qasm.contains("u3(0.1, 0.2, -0.3) q[0];"));
+}
+
+#[test]
+fn openqasm3_exports_parameterized_gates() {
+    let mut circuit = Circuit::new(1);
+    circuit
+        .rx(0.5, 0)
+        .ry(-0.25, 0)
+        .rz(1.125, 0)
+        .u3(0.1, 0.2, -0.3, 0);
+
+    let qasm = export_openqasm3(&circuit).unwrap();
+
+    assert!(qasm.contains("rx(0.5) q[0];"));
+    assert!(qasm.contains("ry(-0.25) q[0];"));
+    assert!(qasm.contains("rz(1.125) q[0];"));
+    assert!(qasm.contains("U(0.1, 0.2, -0.3) q[0];"));
+    assert!(!qasm.contains("u3("));
+}
+
+#[test]
 fn exports_bell_circuit() {
     let circuit = catalog::bell(BellState::PhiPlus);
     let qasm = export_openqasm2(&circuit).unwrap();

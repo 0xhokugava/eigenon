@@ -16,7 +16,7 @@ pub fn write_operations(
     for operation in circuit.operations() {
         match operation {
             Operation::SingleQubit { gate, target } => {
-                output.push_str(&format!("{} q[{}];\n", openqasm_gate_name(*gate), target));
+                write_single_qubit_gate(output, version, *gate, *target);
             }
 
             Operation::Cnot { control, target } => {
@@ -50,6 +50,35 @@ pub fn write_operations(
     }
 
     Ok(())
+}
+
+fn write_single_qubit_gate(
+    output: &mut String,
+    version: OpenQasmVersion,
+    gate: GateKind,
+    target: usize,
+) {
+    match gate {
+        GateKind::Rx(theta) => {
+            output.push_str(&format!("rx({theta}) q[{target}];\n"));
+        }
+        GateKind::Ry(theta) => {
+            output.push_str(&format!("ry({theta}) q[{target}];\n"));
+        }
+        GateKind::Rz(theta) => {
+            output.push_str(&format!("rz({theta}) q[{target}];\n"));
+        }
+        GateKind::U { theta, phi, lambda } => {
+            let name = match version {
+                OpenQasmVersion::V2 => "u3",
+                OpenQasmVersion::V3 => "U",
+            };
+            output.push_str(&format!("{name}({theta}, {phi}, {lambda}) q[{target}];\n"));
+        }
+        _ => {
+            output.push_str(&format!("{} q[{target}];\n", fixed_gate_name(gate)));
+        }
+    }
 }
 
 fn write_multi_controlled_gate(
@@ -117,7 +146,7 @@ fn qasm_operands(controls: &[usize], target: usize) -> String {
         .join(", ")
 }
 
-fn openqasm_gate_name(gate: GateKind) -> &'static str {
+fn fixed_gate_name(gate: GateKind) -> &'static str {
     match gate {
         GateKind::X => "x",
         GateKind::Y => "y",
@@ -126,5 +155,8 @@ fn openqasm_gate_name(gate: GateKind) -> &'static str {
         GateKind::S => "s",
         GateKind::T => "t",
         GateKind::I => "id",
+        GateKind::Rx(_) | GateKind::Ry(_) | GateKind::Rz(_) | GateKind::U { .. } => {
+            unreachable!("parameterized gates are formatted separately")
+        }
     }
 }

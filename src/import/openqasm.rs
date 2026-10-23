@@ -937,6 +937,18 @@ fn lower_program(program: Program) -> Result<Circuit, OpenQasmImportError> {
                 GateKind::T => {
                     circuit.t(target);
                 }
+                GateKind::Rx(theta) => {
+                    circuit.rx(theta, target);
+                }
+                GateKind::Ry(theta) => {
+                    circuit.ry(theta, target);
+                }
+                GateKind::Rz(theta) => {
+                    circuit.rz(theta, target);
+                }
+                GateKind::U { theta, phi, lambda } => {
+                    circuit.u(theta, phi, lambda, target);
+                }
             },
             LoweredOperation::Cnot { control, target } => {
                 circuit.cnot(control, target);

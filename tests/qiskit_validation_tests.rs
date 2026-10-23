@@ -126,6 +126,28 @@ fn qiskit_validates_single_control_mcx_and_mcz_export() {
 
 #[test]
 #[ignore]
+fn qiskit_validates_parameterized_gate_exports() {
+    let exporters: [(&str, OpenQasmExporter); 2] =
+        [("2.0", export_openqasm2), ("3.0", export_openqasm3)];
+
+    for (version, export) in exporters {
+        let mut circuit = Circuit::new(1);
+        circuit
+            .rx(0.3, 0)
+            .ry(-0.4, 0)
+            .rz(0.5, 0)
+            .u(0.6, -0.7, 0.8, 0);
+
+        let qasm = export(&circuit).unwrap();
+        let stdout = validate_with_qiskit(&format!("openqasm{version}_parameterized"), &qasm);
+
+        assert!(stdout.contains(&format!("OpenQASM version: {version}")));
+        assert!(stdout.contains("Validation passed."));
+    }
+}
+
+#[test]
+#[ignore]
 fn qiskit_validates_non_adjacent_controls_and_middle_target() {
     let mut openqasm2_circuit = Circuit::new(3);
     openqasm2_circuit.x(2).x(0).mcx(&[2, 0], 1);
