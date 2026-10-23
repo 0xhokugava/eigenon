@@ -88,6 +88,48 @@ pub fn gate_t() -> Array2<Complex64> {
     array![[1.0.into(), 0.0.into()], [0.0.into(), phase]]
 }
 
+/// Rotation around the X axis by `theta` radians.
+pub fn gate_rx(theta: f64) -> Array2<Complex64> {
+    let cosine = Complex64::new((theta / 2.0).cos(), 0.0);
+    let sine = Complex64::new(0.0, -(theta / 2.0).sin());
+
+    array![[cosine, sine], [sine, cosine]]
+}
+
+/// Rotation around the Y axis by `theta` radians.
+pub fn gate_ry(theta: f64) -> Array2<Complex64> {
+    let cosine = Complex64::new((theta / 2.0).cos(), 0.0);
+    let sine = Complex64::new((theta / 2.0).sin(), 0.0);
+
+    array![[cosine, -sine], [sine, cosine]]
+}
+
+/// Rotation around the Z axis by `theta` radians.
+pub fn gate_rz(theta: f64) -> Array2<Complex64> {
+    let negative_phase = Complex64::from_polar(1.0, -theta / 2.0);
+    let positive_phase = Complex64::from_polar(1.0, theta / 2.0);
+
+    array![
+        [negative_phase, Complex64::new(0.0, 0.0)],
+        [Complex64::new(0.0, 0.0), positive_phase]
+    ]
+}
+
+/// Universal single-qubit gate using OpenQASM's `U(theta, phi, lambda)`
+/// convention. All angles are expressed in radians.
+pub fn gate_u(theta: f64, phi: f64, lambda: f64) -> Array2<Complex64> {
+    let cosine = (theta / 2.0).cos();
+    let sine = (theta / 2.0).sin();
+    let phi_phase = Complex64::from_polar(1.0, phi);
+    let lambda_phase = Complex64::from_polar(1.0, lambda);
+    let combined_phase = Complex64::from_polar(1.0, phi + lambda);
+
+    array![
+        [Complex64::new(cosine, 0.0), -lambda_phase * sine],
+        [phi_phase * sine, combined_phase * cosine]
+    ]
+}
+
 // Multi-Qubit Gates
 
 /// Controlled-NOT (CNOT) gate.

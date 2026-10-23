@@ -111,7 +111,7 @@ Eigenon also keeps a dense full-operator implementation for correctness verifica
 Single-qubit gates:
 
 ```text
-I, X, Y, Z, H, S, T
+I, X, Y, Z, H, S, T, Rx(theta), Ry(theta), Rz(theta), U(theta, phi, lambda)
 ```
 
 Two-qubit gates:
@@ -121,6 +121,11 @@ CNOT, CZ
 ```
 
 The generic execution engine can also apply arbitrary local `2^k × 2^k` gate matrices.
+
+Parameterized gate angles are stored as finite `f64` values in radians. Matrix
+construction remains at the execution boundary, while exporters preserve the
+semantic gate and its parameters. OpenQASM 2.0 names the universal gate `u3`;
+OpenQASM 3.0 names the equivalent gate `U`.
 
 ## Algorithms
 
@@ -168,8 +173,8 @@ and `bit`. These inputs receive a dedicated unsupported-version error instead
 of a misleading OpenQASM 2.0 syntax error. OpenQASM 3 lowering remains outside
 the current importer scope.
 
-Parameterized gates, multiple registers and additional framework adapters
-remain future work.
+Parameterized gate import, multiple registers and additional framework
+adapters remain future work.
 
 ## CLI Gate Representation
 
@@ -180,6 +185,8 @@ h:0
 x:1
 cnot:0,1
 cz:1,2
+rx:1.5707963267948966,0
+u:0.1,0.2,0.3,1
 ```
 
 Responsibilities are separated:

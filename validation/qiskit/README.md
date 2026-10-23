@@ -94,6 +94,10 @@ The current exporter supports:
 * `h`
 * `s`
 * `t`
+* `rx(theta)`
+* `ry(theta)`
+* `rz(theta)`
+* `u3(theta, phi, lambda)`
 * `cx`
 * `cz`
 * one-control MCX and MCZ as `cx` and `cz`
@@ -106,6 +110,10 @@ OpenQASM 2.0 MCX and MCZ operations with more than two controls remain
 unsupported because they require an explicit ancilla and decomposition policy.
 OpenQASM 3.0 exports MCX and MCZ with any valid number of controls using the
 standard `ctrl(n) @` modifier.
+
+OpenQASM 3.0 emits the universal gate as `U(theta, phi, lambda)`. The ignored
+Rust integration suite asks Qiskit to parse and execute parameterized gate
+sequences exported in both versions.
 
 Measured circuits are parsed by Qiskit with their classical register and
 qubit-to-classical-bit mapping preserved.

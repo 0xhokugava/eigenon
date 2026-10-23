@@ -1,8 +1,10 @@
 use eigenon::engine::constants::{
-    gate_cnot, gate_h, gate_s, gate_t, gate_x, gate_y, gate_z, identity, q0, q1,
+    gate_cnot, gate_h, gate_rx, gate_ry, gate_rz, gate_s, gate_t, gate_u, gate_x, gate_y, gate_z,
+    identity, q0, q1,
 };
 use ndarray::{Array2, array};
 use num_complex::Complex64;
+use std::f64::consts::PI;
 
 fn to_c64(re: f64) -> Complex64 {
     Complex64::new(re, 0.0)
@@ -110,4 +112,22 @@ fn test_hadamard_conjugation() {
     // HZH = X (Hadamard transforms a Z-basis to X-basis)
     let hzh = gate_h().dot(&gate_z()).dot(&gate_h());
     assert_matrix_eq(&hzh, &gate_x());
+}
+
+#[test]
+fn test_pi_rotation_matrices() {
+    let zero = Complex64::new(0.0, 0.0);
+    let i = Complex64::i();
+
+    assert_matrix_eq(&gate_rx(PI), &array![[zero, -i], [-i, zero]]);
+    assert_matrix_eq(
+        &gate_ry(PI),
+        &array![[zero, Complex64::new(-1.0, 0.0)], [1.0.into(), zero]],
+    );
+    assert_matrix_eq(&gate_rz(PI), &array![[-i, zero], [zero, i]]);
+}
+
+#[test]
+fn test_u_gate_can_represent_pauli_x() {
+    assert_matrix_eq(&gate_u(PI, 0.0, PI), &gate_x());
 }

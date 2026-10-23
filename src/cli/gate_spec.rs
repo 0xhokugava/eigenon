@@ -1,7 +1,7 @@
 use crate::circuit::core::Circuit;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GateSpec {
     H(usize),
     X(usize),
@@ -10,10 +10,40 @@ pub enum GateSpec {
     S(usize),
     T(usize),
     I(usize),
-    Cnot { control: usize, target: usize },
-    Cz { control: usize, target: usize },
-    Mcx { controls: Vec<usize>, target: usize },
-    Mcz { controls: Vec<usize>, target: usize },
+    Rx {
+        theta: f64,
+        target: usize,
+    },
+    Ry {
+        theta: f64,
+        target: usize,
+    },
+    Rz {
+        theta: f64,
+        target: usize,
+    },
+    U {
+        theta: f64,
+        phi: f64,
+        lambda: f64,
+        target: usize,
+    },
+    Cnot {
+        control: usize,
+        target: usize,
+    },
+    Cz {
+        control: usize,
+        target: usize,
+    },
+    Mcx {
+        controls: Vec<usize>,
+        target: usize,
+    },
+    Mcz {
+        controls: Vec<usize>,
+        target: usize,
+    },
 }
 
 impl GateSpec {
@@ -26,6 +56,15 @@ impl GateSpec {
             GateSpec::S(qubit) => circuit.s(*qubit),
             GateSpec::T(qubit) => circuit.t(*qubit),
             GateSpec::I(qubit) => circuit.i(*qubit),
+            GateSpec::Rx { theta, target } => circuit.rx(*theta, *target),
+            GateSpec::Ry { theta, target } => circuit.ry(*theta, *target),
+            GateSpec::Rz { theta, target } => circuit.rz(*theta, *target),
+            GateSpec::U {
+                theta,
+                phi,
+                lambda,
+                target,
+            } => circuit.u(*theta, *phi, *lambda, *target),
             GateSpec::Cnot { control, target } => circuit.cnot(*control, *target),
             GateSpec::Cz { control, target } => circuit.cz(*control, *target),
             GateSpec::Mcx { controls, target } => circuit.mcx(controls, *target),
@@ -45,6 +84,23 @@ impl GateSpec {
             | GateSpec::T(qubit)
             | GateSpec::I(qubit) => {
                 validate_qubit(*qubit, n_qubits)?;
+            }
+            GateSpec::Rx { theta, target }
+            | GateSpec::Ry { theta, target }
+            | GateSpec::Rz { theta, target } => {
+                validate_angle(*theta)?;
+                validate_qubit(*target, n_qubits)?;
+            }
+            GateSpec::U {
+                theta,
+                phi,
+                lambda,
+                target,
+            } => {
+                validate_angle(*theta)?;
+                validate_angle(*phi)?;
+                validate_angle(*lambda)?;
+                validate_qubit(*target, n_qubits)?;
             }
             GateSpec::Cnot { control, target } | GateSpec::Cz { control, target } => {
                 validate_qubit(*control, n_qubits)?;
@@ -102,6 +158,27 @@ impl FromStr for GateSpec {
             "s" => Ok(GateSpec::S(parse_qubit(operands)?)),
             "t" => Ok(GateSpec::T(parse_qubit(operands)?)),
             "i" => Ok(GateSpec::I(parse_qubit(operands)?)),
+            "rx" => {
+                let (theta, target) = parse_angle_target(operands, "rx")?;
+                Ok(GateSpec::Rx { theta, target })
+            }
+            "ry" => {
+                let (theta, target) = parse_angle_target(operands, "ry")?;
+                Ok(GateSpec::Ry { theta, target })
+            }
+            "rz" => {
+                let (theta, target) = parse_angle_target(operands, "rz")?;
+                Ok(GateSpec::Rz { theta, target })
+            }
+            "u" | "u3" => {
+                let (theta, phi, lambda, target) = parse_u_operands(operands, &gate_name)?;
+                Ok(GateSpec::U {
+                    theta,
+                    phi,
+                    lambda,
+                    target,
+                })
+            }
             "cnot" => {
                 let (control, target) = parse_control_target(operands, &gate_name)?;
                 Ok(GateSpec::Cnot { control, target })
@@ -129,6 +206,38 @@ fn parse_qubit(value: &str) -> Result<usize, String> {
         .trim()
         .parse::<usize>()
         .map_err(|_| format!("Invalid qubit index: {}", value.trim()))
+}
+
+fn parse_angle(value: &str) -> Result<f64, String> {
+    let value = value.trim();
+    let angle = value
+        .parse::<f64>()
+        .map_err(|_| format!("Invalid angle: {value}"))?;
+    validate_angle(angle)?;
+    Ok(angle)
+}
+
+fn parse_angle_target(operands: &str, gate_name: &str) -> Result<(f64, usize), String> {
+    let values = operands.split(',').collect::<Vec<_>>();
+    if values.len() != 2 {
+        return Err(format!("{gate_name} requires angle,target"));
+    }
+
+    Ok((parse_angle(values[0])?, parse_qubit(values[1])?))
+}
+
+fn parse_u_operands(operands: &str, gate_name: &str) -> Result<(f64, f64, f64, usize), String> {
+    let values = operands.split(',').collect::<Vec<_>>();
+    if values.len() != 4 {
+        return Err(format!("{gate_name} requires theta,phi,lambda,target"));
+    }
+
+    Ok((
+        parse_angle(values[0])?,
+        parse_angle(values[1])?,
+        parse_angle(values[2])?,
+        parse_qubit(values[3])?,
+    ))
 }
 
 fn parse_control_target(operands: &str, gate_name: &str) -> Result<(usize, usize), String> {
@@ -178,10 +287,18 @@ fn validate_qubit(qubit: usize, n_qubits: usize) -> Result<(), String> {
     Ok(())
 }
 
+fn validate_angle(angle: f64) -> Result<(), String> {
+    if !angle.is_finite() {
+        return Err("Gate angle must be finite".to_string());
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::GateSpec;
     use crate::circuit::core::Circuit;
+    use std::f64::consts::PI;
 
     #[test]
     fn parses_gate_with_whitespace() {
@@ -272,6 +389,66 @@ mod tests {
 
         assert_eq!(state[0].norm_sqr(), 1.0);
         assert_eq!(state[1].norm_sqr(), 0.0);
+    }
+
+    #[test]
+    fn parses_parameterized_rotation_gates() {
+        assert_eq!(
+            "rx:1.25,2".parse(),
+            Ok(GateSpec::Rx {
+                theta: 1.25,
+                target: 2,
+            })
+        );
+        assert_eq!(
+            "ry:-0.5,1".parse(),
+            Ok(GateSpec::Ry {
+                theta: -0.5,
+                target: 1,
+            })
+        );
+        assert_eq!(
+            "rz:0,0".parse(),
+            Ok(GateSpec::Rz {
+                theta: 0.0,
+                target: 0,
+            })
+        );
+    }
+
+    #[test]
+    fn parses_u_and_u3_as_the_same_gate() {
+        let expected = GateSpec::U {
+            theta: 0.1,
+            phi: -0.2,
+            lambda: 0.3,
+            target: 1,
+        };
+
+        assert_eq!("u:0.1,-0.2,0.3,1".parse(), Ok(expected.clone()));
+        assert_eq!("u3:0.1,-0.2,0.3,1".parse(), Ok(expected));
+    }
+
+    #[test]
+    fn rejects_non_finite_and_incomplete_parameterized_gates() {
+        assert!("rx:NaN,0".parse::<GateSpec>().is_err());
+        assert!("ry:inf,0".parse::<GateSpec>().is_err());
+        assert!("rz:0.5".parse::<GateSpec>().is_err());
+        assert!("u:0.1,0.2,0".parse::<GateSpec>().is_err());
+    }
+
+    #[test]
+    fn applies_parameterized_gate_to_circuit() {
+        let mut circuit = Circuit::new(1);
+        GateSpec::Ry {
+            theta: PI,
+            target: 0,
+        }
+        .apply(&mut circuit);
+        let state = circuit.run();
+
+        assert!(state[0].norm_sqr() < 1e-12);
+        assert!((state[1].norm_sqr() - 1.0).abs() < 1e-12);
     }
 
     #[test]

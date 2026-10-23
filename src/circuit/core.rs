@@ -1,6 +1,7 @@
 use crate::circuit::operation::{GateKind, Operation};
 use crate::engine::constants::{
-    gate_cnot, gate_cz, gate_h, gate_s, gate_t, gate_x, gate_y, gate_z, identity,
+    gate_cnot, gate_cz, gate_h, gate_rx, gate_ry, gate_rz, gate_s, gate_t, gate_u, gate_x, gate_y,
+    gate_z, identity,
 };
 use crate::engine::measurement::measure_qubit_inplace;
 use crate::engine::ops::{apply_controlled_single_qubit_gate_inplace, apply_k_qubit_gate_inplace};
@@ -35,7 +36,15 @@ fn matrix_for_gate(gate: GateKind) -> Array2<Complex64> {
         GateKind::S => gate_s(),
         GateKind::T => gate_t(),
         GateKind::I => identity(),
+        GateKind::Rx(theta) => gate_rx(theta),
+        GateKind::Ry(theta) => gate_ry(theta),
+        GateKind::Rz(theta) => gate_rz(theta),
+        GateKind::U { theta, phi, lambda } => gate_u(theta, phi, lambda),
     }
+}
+
+fn validate_angle(name: &str, angle: f64) {
+    assert!(angle.is_finite(), "{name} angle must be finite");
 }
 
 impl Circuit {
@@ -243,6 +252,62 @@ impl Circuit {
     /// Panics when `target` is outside the quantum register.
     pub fn i(&mut self, target: usize) -> &mut Self {
         self.add_single_qubit_gate(GateKind::I, target)
+    }
+
+    /// Adds an X-axis rotation by `theta` radians on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `theta` is not finite or `target` is outside the quantum
+    /// register.
+    pub fn rx(&mut self, theta: f64, target: usize) -> &mut Self {
+        validate_angle("Rx", theta);
+        self.add_single_qubit_gate(GateKind::Rx(theta), target)
+    }
+
+    /// Adds a Y-axis rotation by `theta` radians on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `theta` is not finite or `target` is outside the quantum
+    /// register.
+    pub fn ry(&mut self, theta: f64, target: usize) -> &mut Self {
+        validate_angle("Ry", theta);
+        self.add_single_qubit_gate(GateKind::Ry(theta), target)
+    }
+
+    /// Adds a Z-axis rotation by `theta` radians on `target`.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `theta` is not finite or `target` is outside the quantum
+    /// register.
+    pub fn rz(&mut self, theta: f64, target: usize) -> &mut Self {
+        validate_angle("Rz", theta);
+        self.add_single_qubit_gate(GateKind::Rz(theta), target)
+    }
+
+    /// Adds a universal single-qubit gate on `target`.
+    ///
+    /// The angles use the OpenQASM `U(theta, phi, lambda)` convention and are
+    /// expressed in radians.
+    ///
+    /// # Panics
+    ///
+    /// Panics when any angle is not finite or `target` is outside the quantum
+    /// register.
+    pub fn u(&mut self, theta: f64, phi: f64, lambda: f64, target: usize) -> &mut Self {
+        validate_angle("U theta", theta);
+        validate_angle("U phi", phi);
+        validate_angle("U lambda", lambda);
+        self.add_single_qubit_gate(GateKind::U { theta, phi, lambda }, target)
+    }
+
+    /// Adds a universal single-qubit gate using the OpenQASM 2.0 `u3` name.
+    ///
+    /// This is an alias for [`Circuit::u`].
+    pub fn u3(&mut self, theta: f64, phi: f64, lambda: f64, target: usize) -> &mut Self {
+        self.u(theta, phi, lambda, target)
     }
 
     /// Adds a Hadamard gate to every qubit in ascending index order.

@@ -7,16 +7,17 @@
 //! # Supported operations
 //!
 //! Both exporters support the built-in `I`, `X`, `Y`, `Z`, `H`, `S` and `T`
-//! single-qubit gates, plus CNOT, CZ and measurement operations. A classical
-//! register is emitted only when the circuit declares classical bits.
+//! gates, the parameterized `Rx`, `Ry`, `Rz` and universal `U` single-qubit
+//! gates, plus CNOT, CZ and measurement operations. Angles are emitted in
+//! radians. A classical register is emitted only when the circuit declares
+//! classical bits.
 //!
 //! OpenQASM 2.0 exports one- and two-control MCX/MCZ operations using `cx`,
 //! `cz`, `ccx` and an H/CCX/H decomposition. Operations with more than two
 //! controls return [`OpenQasmExportError::UnsupportedOperation`] because they
 //! require an explicit ancilla and decomposition policy. OpenQASM 3.0 exports
 //! any supported control count with the standard `ctrl(n) @` modifier.
-//! The circuit model does not currently represent custom or parameterized
-//! gates.
+//! The circuit model does not currently represent custom gates.
 
 use crate::circuit::core::Circuit;
 use crate::circuit::operation::Operation;
@@ -24,7 +25,7 @@ use crate::export::openqasm_helper::{OpenQasmVersion, write_operations};
 use std::fmt;
 
 /// Error returned when a circuit cannot be represented by an exporter.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum OpenQasmExportError {
     /// The circuit contains an operation unsupported by the selected format.
     UnsupportedOperation(Operation),

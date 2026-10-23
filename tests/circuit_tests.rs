@@ -6,6 +6,7 @@ use eigenon::engine::constants::{q0, q1};
 use eigenon::engine::utils::assert_states_close;
 use ndarray::ArrayD;
 use num_complex::Complex64;
+use std::f64::consts::PI;
 
 #[test]
 fn test_circuit_bell_state() {
@@ -47,6 +48,83 @@ fn test_circuit_chained_calls() {
     let result = circuit.x(0).x(0).run();
     let expected = q0().into_dyn();
     assert_states_close(&result, &expected);
+}
+
+#[test]
+fn parameterized_gates_preserve_angles_and_order() {
+    let mut circuit = Circuit::new(1);
+    circuit
+        .rx(0.1, 0)
+        .ry(-0.2, 0)
+        .rz(0.3, 0)
+        .u(0.4, -0.5, 0.6, 0);
+
+    assert_eq!(
+        circuit.operations(),
+        &[
+            Operation::SingleQubit {
+                gate: GateKind::Rx(0.1),
+                target: 0,
+            },
+            Operation::SingleQubit {
+                gate: GateKind::Ry(-0.2),
+                target: 0,
+            },
+            Operation::SingleQubit {
+                gate: GateKind::Rz(0.3),
+                target: 0,
+            },
+            Operation::SingleQubit {
+                gate: GateKind::U {
+                    theta: 0.4,
+                    phi: -0.5,
+                    lambda: 0.6,
+                },
+                target: 0,
+            },
+        ]
+    );
+}
+
+#[test]
+fn parameterized_gates_execute_with_expected_state() {
+    let mut rx = Circuit::new(1);
+    let rx_state = rx.rx(PI, 0).run();
+    let expected_rx = ArrayD::from_shape_vec(
+        ndarray::IxDyn(&[2]),
+        vec![Complex64::new(0.0, 0.0), Complex64::new(0.0, -1.0)],
+    )
+    .unwrap();
+    assert_states_close(&rx_state, &expected_rx);
+
+    let mut ry = Circuit::new(1);
+    assert_states_close(&ry.ry(PI, 0).run(), &q1().into_dyn());
+
+    let mut u = Circuit::new(1);
+    assert_states_close(&u.u(PI, 0.0, PI, 0).run(), &q1().into_dyn());
+}
+
+#[test]
+fn inverse_rotations_cancel() {
+    let mut circuit = Circuit::new(1);
+    let state = circuit
+        .h(0)
+        .rx(0.37, 0)
+        .rx(-0.37, 0)
+        .ry(-0.91, 0)
+        .ry(0.91, 0)
+        .rz(1.23, 0)
+        .rz(-1.23, 0)
+        .h(0)
+        .run();
+
+    assert_states_close(&state, &q0().into_dyn());
+}
+
+#[test]
+#[should_panic(expected = "Rx angle must be finite")]
+fn parameterized_gates_reject_non_finite_angles() {
+    Circuit::new(1).rx(f64::NAN, 0);
 }
 #[test]
 fn test_cz_basis_state() {

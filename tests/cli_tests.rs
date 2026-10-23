@@ -37,6 +37,29 @@ fn export_openqasm_accepts_v3() {
 }
 
 #[test]
+fn export_openqasm_accepts_parameterized_gates() {
+    let output = Command::new(env!("CARGO_BIN_EXE_eigenon"))
+        .args([
+            "export-openqasm",
+            "--qubits",
+            "1",
+            "--gate",
+            "rx:0.5,0",
+            "--gate",
+            "u:0.1,0.2,0.3,0",
+            "--qasm-version",
+            "3",
+        ])
+        .output()
+        .unwrap();
+
+    assert!(output.status.success());
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("rx(0.5) q[0];"));
+    assert!(stdout.contains("U(0.1, 0.2, 0.3) q[0];"));
+}
+
+#[test]
 fn import_openqasm_accepts_file_path() {
     let cli =
         Cli::try_parse_from(["eigenon", "import-openqasm", "--file", "circuit.qasm"]).unwrap();

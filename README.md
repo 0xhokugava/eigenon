@@ -6,7 +6,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 
 * Matrix-free in-place state-vector execution
 * Generic local `k`-qubit gate application
-* Single-qubit gates: X, Y, Z, H, S, T, I
+* Single-qubit gates: X, Y, Z, H, S, T, I, Rx, Ry, Rz and U
 * Two-qubit gates: CNOT and CZ
 * Multi-controlled gates: MCX and MCZ
 * High-level Circuit API
@@ -104,6 +104,10 @@ z:0
 s:0
 t:0
 i:0
+rx:1.5707963267948966,0
+ry:-0.5,0
+rz:0.25,0
+u:0.1,0.2,0.3,0
 cnot:0,1
 cz:0,1
 mcx:0,1:2
@@ -116,6 +120,10 @@ For multi-controlled gates, the syntax is:
 mcx:controls:target
 mcz:controls:target
 ```
+
+Parameterized gate angles are decimal radians. Rotation gates use
+`rx:angle,target`, `ry:angle,target` and `rz:angle,target`. The universal gate
+uses `u:theta,phi,lambda,target`; `u3` is accepted as a CLI alias.
 
 Show available algorithm demos:
 
@@ -161,7 +169,14 @@ cnot(control, target)
 cz(control, target)
 mcx(controls, target)
 mcz(controls, target)
+rx(theta, target)
+ry(theta, target)
+rz(theta, target)
+u(theta, phi, lambda, target)
 ```
+
+All parameterized-gate angles are expressed in radians. `u3(...)` is also
+available as an alias for `u(...)`.
 
 Qubit `q0` is the least significant bit and appears as the rightmost bit in printed basis states.
 
@@ -191,6 +206,10 @@ cargo run --quiet -- export-openqasm \
 OpenQASM 2.0 exports MCX and MCZ operations with one or two controls. Two-control
 MCX uses `ccx`, while two-control MCZ is decomposed as H/CCX/H. OpenQASM 3.0
 exports any valid control count with the standard `ctrl(n) @` modifier.
+
+Both exporters support `rx`, `ry` and `rz`. The universal single-qubit gate is
+written as `u3(theta, phi, lambda)` in OpenQASM 2.0 and
+`U(theta, phi, lambda)` in OpenQASM 3.0.
 
 ## OpenQASM import
 
