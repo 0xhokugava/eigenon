@@ -37,6 +37,7 @@
 * [x] Dedicated parameterized-gate benchmark suite
 * [x] Reproducible experiment definitions and raw result records
 * [x] Named circuit parameters and deterministic numeric binding
+* [x] Matrix-free Pauli observables and Hamiltonian expectation values
 
 ## Current Focus
 

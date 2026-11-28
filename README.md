@@ -11,6 +11,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Multi-controlled gates: MCX and MCZ
 * High-level Circuit API
 * Reusable circuit templates with named rotation parameters
+* Matrix-free Pauli observables and Hamiltonian expectation values
 * Dirac notation output
 * Shot-based measurement simulation
 * Deutsch, Deutsch–Jozsa and Grover search demos
@@ -211,6 +212,41 @@ Run the complete example with:
 
 ```bash
 cargo run --example parameterized_circuit
+```
+
+### Observables and expectation values
+
+Evaluate Pauli strings and weighted Hamiltonians directly from a statevector
+without allocating a dense `2^n × 2^n` observable matrix:
+
+```rust
+use eigenon::circuit::core::Circuit;
+use eigenon::observable::{Hamiltonian, Pauli, PauliString};
+
+let mut circuit = Circuit::new(2);
+circuit.h(0).cnot(0, 1);
+
+let hamiltonian = Hamiltonian::from_terms([
+    (-1.0, PauliString::new([(0, Pauli::Z), (1, Pauli::Z)])?),
+    (-0.5, PauliString::single(0, Pauli::X)),
+])?;
+
+let state = circuit.run();
+let energy = hamiltonian.expectation_value(&state, circuit.n_qubits())?;
+
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+An empty `PauliString` represents identity. Pauli operators are stored in
+ascending qubit order, while qubit `0` remains the least-significant bit of a
+statevector index. Duplicate and out-of-range operators, invalid statevector
+dimensions, non-finite values, and excessive imaginary residuals return typed
+errors.
+
+Run the complete example with:
+
+```bash
+cargo run --example observable
 ```
 
 ## OpenQASM export

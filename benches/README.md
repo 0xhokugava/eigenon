@@ -13,6 +13,12 @@ Run only the parameterized-gate suite with:
 cargo bench --bench parameterized_gate_bench
 ```
 
+Run only the observable suite with:
+
+```bash
+cargo bench --bench observable_bench
+```
+
 Criterion writes HTML reports under `target/criterion/`.
 
 ## Parameterized-gate benchmark groups
@@ -44,6 +50,18 @@ and executing a circuit for every numeric parameter set. Throughput is
 reported in parameter sets processed per second. This group is the baseline
 for future parameter-binding work; its semantics should remain stable when a
 bound-circuit benchmark is added later.
+
+## Observable benchmark groups
+
+`observable_pauli_string_width` holds a three-operator Pauli string constant
+while increasing the statevector from 4 to 16 qubits. Throughput is reported
+in amplitudes visited per second.
+
+`observable_hamiltonian_terms` holds a 12-qubit state constant and increases
+the Hamiltonian from 1 to 128 Pauli terms. State preparation and observable
+construction occur outside the measured closure. Throughput reports total
+amplitude-term evaluations, making matrix-free scaling visible without mixing
+it with circuit execution.
 
 ## Interpreting results
 

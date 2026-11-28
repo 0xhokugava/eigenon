@@ -136,6 +136,20 @@ without mutating it. Execution, import and export therefore continue to use one
 numeric circuit representation, while future gradient and OpenQASM 3 layers
 can inspect the symbolic template before binding.
 
+## Observables
+
+`PauliString` represents a tensor product on selected qubits, and `Hamiltonian`
+stores a deterministic weighted list of those strings. Expectation evaluation
+walks the statevector and transforms basis indices and phases directly. It uses
+`O(2^n)` time per Pauli term and `O(1)` auxiliary memory instead of allocating
+a dense `2^n × 2^n` matrix.
+
+Pauli qubit indices follow the same little-endian convention as circuit gates:
+qubit `0` is the least-significant statevector bit. Evaluation validates the
+one-dimensional state size, finite amplitudes, qubit indices, coefficients,
+and the residual imaginary component expected to vanish for Hermitian Pauli
+Hamiltonians.
+
 ## Algorithms
 
 Current algorithm demonstrations include:
