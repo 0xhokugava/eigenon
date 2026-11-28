@@ -38,3 +38,4 @@ pub mod export;
 pub mod gradient;
 pub mod import;
 pub mod observable;
+pub mod variational;

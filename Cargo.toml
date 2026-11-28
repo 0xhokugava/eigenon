@@ -41,5 +41,9 @@ harness = false
 name = "gradient_bench"
 harness = false
 
+[[bench]]
+name = "variational_bench"
+harness = false
+
 [dev-dependencies]
 insta = "1.48.0"

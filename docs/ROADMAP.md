@@ -39,6 +39,7 @@
 * [x] Named circuit parameters and deterministic numeric binding
 * [x] Matrix-free Pauli observables and Hamiltonian expectation values
 * [x] Parameter-shift gradients for symbolic Rx, Ry and Rz gates
+* [x] Deterministic variational runner and minimal VQE example
 
 ## Current Focus
 
