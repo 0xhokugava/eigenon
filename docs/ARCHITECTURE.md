@@ -127,6 +127,15 @@ construction remains at the execution boundary, while exporters preserve the
 semantic gate and its parameters. OpenQASM 2.0 names the universal gate `u3`;
 OpenQASM 3.0 names the equivalent gate `U`.
 
+Reusable parameterized templates are represented separately by
+`ParameterizedCircuit`. Its `Rx`, `Ry` and `Rz` operations may hold either a
+fixed angle or a named `Parameter`. Parameters are unique and ordered by first
+appearance; operations remain in insertion order. Binding validates a complete
+set of finite values and lowers the template to the existing numeric `Circuit`
+without mutating it. Execution, import and export therefore continue to use one
+numeric circuit representation, while future gradient and OpenQASM 3 layers
+can inspect the symbolic template before binding.
+
 ## Algorithms
 
 Current algorithm demonstrations include:

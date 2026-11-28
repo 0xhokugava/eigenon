@@ -10,6 +10,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Two-qubit gates: CNOT and CZ
 * Multi-controlled gates: MCX and MCZ
 * High-level Circuit API
+* Reusable circuit templates with named rotation parameters
 * Dirac notation output
 * Shot-based measurement simulation
 * Deutsch, Deutsch–Jozsa and Grover search demos
@@ -179,6 +180,38 @@ All parameterized-gate angles are expressed in radians. `u3(...)` is also
 available as an alias for `u(...)`.
 
 Qubit `q0` is the least significant bit and appears as the rightmost bit in printed basis states.
+
+### Symbolic circuit parameters
+
+Define a circuit structure once, inspect its required parameters and bind
+different finite values without rebuilding its operations:
+
+```rust
+use eigenon::circuit::{Parameter, ParameterizedCircuit};
+
+let theta = Parameter::new("theta");
+let mut template = ParameterizedCircuit::new(1);
+template.ry(theta.clone(), 0);
+
+assert_eq!(template.parameters(), &[theta.clone()]);
+
+let first = template.bind([(&theta, 0.5)])?;
+let second = template.bind([(&theta, 1.0)])?;
+
+# Ok::<(), eigenon::circuit::BindingError>(())
+```
+
+Named parameters are supported by `rx`, `ry` and `rz`. The same parameter may
+be reused by multiple rotations. Parameter and operation ordering follows
+first appearance and insertion order respectively. Binding reports typed
+errors for missing, duplicate, unknown and non-finite values. It creates an
+ordinary numeric `Circuit`; the template itself is not mutated.
+
+Run the complete example with:
+
+```bash
+cargo run --example parameterized_circuit
+```
 
 ## OpenQASM export
 
