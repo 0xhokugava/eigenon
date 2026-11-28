@@ -9,6 +9,16 @@ use std::fmt;
 /// expectation value.
 pub const DEFAULT_IMAGINARY_TOLERANCE: f64 = 1e-12;
 
+/// An observable that can evaluate a real expectation value from a statevector.
+pub trait ExpectationValue {
+    /// Evaluates this observable for the supplied state and qubit count.
+    fn expectation_value(
+        &self,
+        state: &ArrayD<Complex64>,
+        n_qubits: usize,
+    ) -> Result<f64, ObservableError>;
+}
+
 /// Non-identity single-qubit Pauli operators.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Pauli {
@@ -101,6 +111,16 @@ impl PauliString {
     }
 }
 
+impl ExpectationValue for PauliString {
+    fn expectation_value(
+        &self,
+        state: &ArrayD<Complex64>,
+        n_qubits: usize,
+    ) -> Result<f64, ObservableError> {
+        PauliString::expectation_value(self, state, n_qubits)
+    }
+}
+
 /// A finite real coefficient and its Pauli-string observable.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HamiltonianTerm {
@@ -180,6 +200,16 @@ impl Hamiltonian {
                 sum + term.coefficient * expectation_complex(amplitudes, &term.observable.operators)
             });
         real_part(value, imaginary_tolerance)
+    }
+}
+
+impl ExpectationValue for Hamiltonian {
+    fn expectation_value(
+        &self,
+        state: &ArrayD<Complex64>,
+        n_qubits: usize,
+    ) -> Result<f64, ObservableError> {
+        Hamiltonian::expectation_value(self, state, n_qubits)
     }
 }
 

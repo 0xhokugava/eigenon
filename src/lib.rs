@@ -35,5 +35,6 @@ pub mod cli;
 pub mod engine;
 pub mod experiments;
 pub mod export;
+pub mod gradient;
 pub mod import;
 pub mod observable;
