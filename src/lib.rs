@@ -36,3 +36,4 @@ pub mod engine;
 pub mod experiments;
 pub mod export;
 pub mod import;
+pub mod observable;
