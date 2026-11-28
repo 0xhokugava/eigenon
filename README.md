@@ -12,6 +12,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * High-level Circuit API
 * Reusable circuit templates with named rotation parameters
 * Matrix-free Pauli observables and Hamiltonian expectation values
+* Parameter-shift gradients for symbolic rotation parameters
 * Dirac notation output
 * Shot-based measurement simulation
 * Deutsch, Deutsch–Jozsa and Grover search demos
@@ -247,6 +248,47 @@ Run the complete example with:
 
 ```bash
 cargo run --example observable
+```
+
+### Parameter-shift gradients
+
+Differentiate Pauli or Hamiltonian expectation values for symbolic `Rx`, `Ry`
+and `Rz` parameters:
+
+```rust
+use eigenon::circuit::{Parameter, ParameterizedCircuit};
+use eigenon::gradient::parameter_shift;
+use eigenon::observable::{Hamiltonian, Pauli, PauliString};
+
+let theta = Parameter::new("theta");
+let mut template = ParameterizedCircuit::new(1);
+template.ry(theta.clone(), 0);
+let hamiltonian = Hamiltonian::from_terms([
+    (-1.0, PauliString::single(0, Pauli::Z)),
+])?;
+
+let gradients = parameter_shift(
+    &template,
+    &[(&theta, 0.4)],
+    &hamiltonian,
+    std::slice::from_ref(&theta),
+)?;
+
+println!("dE/dtheta = {}", gradients[&theta]);
+
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+When a parameter is reused, Eigenon shifts each gate occurrence independently
+and sums its contribution. This implements the chain rule correctly; shifting
+all shared occurrences at once is not generally valid. Measurements are
+rejected because this initial API differentiates deterministic statevector
+expectations. Extremely large finite bindings are rejected when floating-point
+precision cannot represent `theta ± pi/2` within a relative shift distortion
+of `1e-12`.
+
+```bash
+cargo run --example gradient
 ```
 
 ## OpenQASM export

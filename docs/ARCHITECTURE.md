@@ -150,6 +150,19 @@ one-dimensional state size, finite amplitudes, qubit indices, coefficients,
 and the residual imaginary component expected to vanish for Hermitian Pauli
 Hamiltonians.
 
+## Gradients
+
+The parameter-shift layer consumes a `ParameterizedCircuit` and any observable
+implementing `ExpectationValue`. For `Rx`, `Ry`, and `Rz`, each symbolic gate
+occurrence is evaluated at `theta ± pi/2`; its contribution is half the
+difference of the two expectation values.
+
+If one named parameter appears in several gates, occurrences are shifted one
+at a time and their derivatives are summed. This preserves the chain rule and
+avoids the incorrect shortcut of shifting every occurrence simultaneously.
+The gradient map uses stable parameter-name ordering. Measurement operations
+are outside the deterministic first-phase API.
+
 ## Algorithms
 
 Current algorithm demonstrations include:

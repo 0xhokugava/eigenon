@@ -19,6 +19,12 @@ Run only the observable suite with:
 cargo bench --bench observable_bench
 ```
 
+Run only the gradient suite with:
+
+```bash
+cargo bench --bench gradient_bench
+```
+
 Criterion writes HTML reports under `target/criterion/`.
 
 ## Parameterized-gate benchmark groups
@@ -62,6 +68,17 @@ the Hamiltonian from 1 to 128 Pauli terms. State preparation and observable
 construction occur outside the measured closure. Throughput reports total
 amplitude-term evaluations, making matrix-free scaling visible without mixing
 it with circuit execution.
+
+## Gradient benchmark groups
+
+`gradient_parameter_count` measures complete parameter-shift evaluation for a
+fixed eight-qubit variational circuit while increasing the number of requested
+parameters from one to eight. Throughput is reported in gradients produced.
+
+`gradient_shared_parameter_occurrences` keeps one named parameter and varies
+how many `Ry` gates reuse it. The benchmark includes the required independent
+plus/minus executions for every occurrence and reports gate-occurrence
+contributions per second.
 
 ## Interpreting results
 

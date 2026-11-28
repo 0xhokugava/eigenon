@@ -411,6 +411,14 @@ impl ParameterizedCircuit {
     where
         I: IntoIterator<Item = (&'a Parameter, f64)>,
     {
+        let values = self.collect_bindings(bindings)?;
+        Ok(self.bind_values(&values, None))
+    }
+
+    fn collect_bindings<'a, I>(&self, bindings: I) -> Result<BTreeMap<Parameter, f64>, BindingError>
+    where
+        I: IntoIterator<Item = (&'a Parameter, f64)>,
+    {
         let mut values = BTreeMap::new();
         for (parameter, value) in bindings {
             if !self.parameters.contains(parameter) {
@@ -430,18 +438,38 @@ impl ParameterizedCircuit {
             }
         }
 
+        Ok(values)
+    }
+
+    fn bind_values(
+        &self,
+        values: &BTreeMap<Parameter, f64>,
+        shifted_operation: Option<(usize, f64)>,
+    ) -> Circuit {
         let mut circuit = Circuit::with_classical_bits(self.n_qubits, self.n_classical_bits);
-        for operation in &self.operations {
-            bind_operation(&mut circuit, operation, &values);
+        for (index, operation) in self.operations.iter().enumerate() {
+            let shift = shifted_operation
+                .filter(|(operation_index, _)| *operation_index == index)
+                .map_or(0.0, |(_, shift)| shift);
+            bind_operation(&mut circuit, operation, values, shift);
         }
-        Ok(circuit)
+        circuit
+    }
+
+    pub(crate) fn bind_with_operation_shift(
+        &self,
+        values: &BTreeMap<Parameter, f64>,
+        operation_index: usize,
+        shift: f64,
+    ) -> Circuit {
+        self.bind_values(values, Some((operation_index, shift)))
     }
 }
 
-fn resolve(value: &ParameterValue, bindings: &BTreeMap<Parameter, f64>) -> f64 {
+fn resolve(value: &ParameterValue, bindings: &BTreeMap<Parameter, f64>, shift: f64) -> f64 {
     match value {
-        ParameterValue::Fixed(value) => *value,
-        ParameterValue::Symbol(parameter) => bindings[parameter],
+        ParameterValue::Fixed(value) => *value + shift,
+        ParameterValue::Symbol(parameter) => bindings[parameter] + shift,
     }
 }
 
@@ -449,6 +477,7 @@ fn bind_operation(
     circuit: &mut Circuit,
     operation: &ParameterizedOperation,
     bindings: &BTreeMap<Parameter, f64>,
+    shift: f64,
 ) {
     match operation {
         ParameterizedOperation::SingleQubit { gate, target } => match gate {
@@ -474,13 +503,13 @@ fn bind_operation(
                 circuit.i(*target);
             }
             ParameterizedGateKind::Rx(value) => {
-                circuit.rx(resolve(value, bindings), *target);
+                circuit.rx(resolve(value, bindings, shift), *target);
             }
             ParameterizedGateKind::Ry(value) => {
-                circuit.ry(resolve(value, bindings), *target);
+                circuit.ry(resolve(value, bindings, shift), *target);
             }
             ParameterizedGateKind::Rz(value) => {
-                circuit.rz(resolve(value, bindings), *target);
+                circuit.rz(resolve(value, bindings, shift), *target);
             }
             ParameterizedGateKind::U { theta, phi, lambda } => {
                 circuit.u(*theta, *phi, *lambda, *target);

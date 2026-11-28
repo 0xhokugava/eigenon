@@ -38,6 +38,7 @@
 * [x] Reproducible experiment definitions and raw result records
 * [x] Named circuit parameters and deterministic numeric binding
 * [x] Matrix-free Pauli observables and Hamiltonian expectation values
+* [x] Parameter-shift gradients for symbolic Rx, Ry and Rz gates
 
 ## Current Focus
 
