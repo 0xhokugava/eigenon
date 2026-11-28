@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "experiment_id": "bell-state-probabilities-smoke",
+  "fixture": "bell_state_probabilities",
+  "parameters": {},
+  "seed": 7,
+  "trials": 2,
+  "shots": 0,
+  "tolerances": {
+    "absolute": 1e-12,
+    "relative": 1e-12
+  }
+}

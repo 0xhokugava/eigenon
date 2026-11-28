@@ -1,5 +1,5 @@
 use eigenon::engine::constants::{q0, q1};
-use eigenon::engine::measurement::{measure, test_measure};
+use eigenon::engine::measurement::{measure, sample_measurements_with_seed, test_measure};
 use ndarray::array;
 use num_complex::Complex64;
 use std::f64::consts::FRAC_1_SQRT_2;
@@ -39,4 +39,16 @@ fn test_measure_statistics() {
     // Sum must be exactly 100% or very close
     let total_sum: f64 = results.values().sum();
     assert!((total_sum - 100.0).abs() < 1e-9);
+}
+
+#[test]
+fn seeded_measurements_preserve_the_raw_sequence() {
+    let h_state = array![FRAC_1_SQRT_2, FRAC_1_SQRT_2].map(|&x| to_c64(x));
+
+    let first = sample_measurements_with_seed(&h_state, 128, 42);
+    let second = sample_measurements_with_seed(&h_state, 128, 42);
+    let different_seed = sample_measurements_with_seed(&h_state, 128, 43);
+
+    assert_eq!(first, second);
+    assert_ne!(first, different_seed);
 }

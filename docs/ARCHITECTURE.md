@@ -208,6 +208,8 @@ apply       → add the operation to Circuit
     - `circuit_demos/`: User-facing demos built with the Circuit API.
     - `engine_verification/`: Low-level verification experiments for in-place execution.
     - `foundations/`: Educational examples for tensor products and basic concepts.
+    - `harness`: Versioned definitions, seeded trials and raw experiment records.
+- `experiments/fixtures/`: Saved deterministic and stochastic experiment definitions.
 - `src/export/`: OpenQASM 2.0 and OpenQASM 3.0 exporters.
 - `src/import/`: OpenQASM 2.0 parsing, validation and circuit lowering.
 - `src/lib.rs`: Quantum simulator library.

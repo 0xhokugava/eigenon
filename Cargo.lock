@@ -302,6 +302,8 @@ dependencies = [
  "ndarray",
  "num-complex",
  "rand",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

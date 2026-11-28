@@ -35,6 +35,7 @@
 * [x] Basic OpenQASM 2.0 import
 * [x] Parameterized Rx, Ry, Rz and U gates
 * [x] Dedicated parameterized-gate benchmark suite
+* [x] Reproducible experiment definitions and raw result records
 
 ## Current Focus
 
