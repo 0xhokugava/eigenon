@@ -25,6 +25,12 @@ Run only the gradient suite with:
 cargo bench --bench gradient_bench
 ```
 
+Run only the variational suite with:
+
+```bash
+cargo bench --bench variational_bench
+```
+
 Criterion writes HTML reports under `target/criterion/`.
 
 ## Parameterized-gate benchmark groups
@@ -79,6 +85,18 @@ parameters from one to eight. Throughput is reported in gradients produced.
 how many `Ry` gates reuse it. The benchmark includes the required independent
 plus/minus executions for every occurrence and reports gate-occurrence
 contributions per second.
+
+## Variational benchmark groups
+
+`variational_vqe_iterations` measures the complete deterministic bind,
+parameter-shift, circuit-execution, Hamiltonian-expectation, update, and
+history-recording loop for a fixed four-parameter ansatz. It scales the exact
+number of evaluated optimizer iterations and reports iterations per second.
+
+`variational_vqe_parameter_count` performs one complete objective and gradient
+evaluation while scaling a linearly entangled ansatz from one to eight named
+parameters. Setup and Hamiltonian construction remain outside the measured
+closure; throughput is reported in parameters processed per evaluation.
 
 ## Interpreting results
 

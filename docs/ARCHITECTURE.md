@@ -163,6 +163,23 @@ avoids the incorrect shortcut of shifting every occurrence simultaneously.
 The gradient map uses stable parameter-name ordering. Measurement operations
 are outside the deterministic first-phase API.
 
+## Variational optimization
+
+`VqeProblem` is a thin orchestration layer over parameter binding, numeric
+`Circuit` execution, matrix-free Hamiltonian expectation values, and
+parameter-shift gradients. It deliberately owns no second simulator or
+observable representation. The public `Optimizer` trait accepts a validated
+name-sorted initial parameter map, while `GradientDescent` supplies the first
+deterministic implementation.
+
+Each objective evaluation records its parameters, energy, and gradients.
+Results retain the best evaluated point rather than an unevaluated final
+update. Convergence uses the maximum absolute gradient; iteration limits and
+floating-point configuration are validated explicitly. Measurement-bearing
+templates are rejected by the gradient layer before a stochastic energy run.
+Qubit indices in the ansatz and Hamiltonian use the project-wide convention:
+qubit `0` is the least-significant statevector bit.
+
 ## Algorithms
 
 Current algorithm demonstrations include:

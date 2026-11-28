@@ -13,6 +13,7 @@ Quantum state-vector simulator and circuit toolkit focused on matrix-free execut
 * Reusable circuit templates with named rotation parameters
 * Matrix-free Pauli observables and Hamiltonian expectation values
 * Parameter-shift gradients for symbolic rotation parameters
+* Deterministic variational optimization and a minimal VQE workflow
 * Dirac notation output
 * Shot-based measurement simulation
 * Deutsch, Deutsch–Jozsa and Grover search demos
@@ -289,6 +290,52 @@ of `1e-12`.
 
 ```bash
 cargo run --example gradient
+```
+
+### Variational optimization and VQE
+
+Combine a parameterized ansatz, Hamiltonian, and pluggable classical optimizer
+into a deterministic variational loop:
+
+```rust
+use eigenon::circuit::{Parameter, ParameterizedCircuit};
+use eigenon::observable::{Hamiltonian, Pauli, PauliString};
+use eigenon::variational::{GradientDescent, VqeProblem};
+
+let theta = Parameter::new("theta");
+let mut ansatz = ParameterizedCircuit::new(1);
+ansatz.ry(theta.clone(), 0);
+let hamiltonian = Hamiltonian::from_terms([
+    (1.0, PauliString::single(0, Pauli::Z)),
+])?;
+
+let result = VqeProblem::new(ansatz, hamiltonian).minimize(
+    GradientDescent::new(0.2)
+        .max_iterations(200)
+        .convergence_tolerance(1e-10),
+    [(&theta, 0.25)],
+)?;
+
+assert!(result.converged);
+assert!((result.minimum + 1.0).abs() < 1e-12);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+Every iteration records its zero-based index, name-sorted parameter bindings,
+energy, and parameter-shift gradients. The returned minimum is the best energy
+actually evaluated, including when the iteration limit is reached. Gradient
+descent is deterministic and uses the maximum absolute gradient as its
+convergence criterion. Custom optimizers implement the public `Optimizer`
+trait and reuse `VqeProblem::energy` and `VqeProblem::gradients`.
+Measurement-bearing templates are rejected by both objective methods because
+post-measurement statevectors would make optimization stochastic.
+
+The ansatz, Pauli strings, and history all preserve Eigenon's convention that
+qubit `0` is the least-significant statevector bit. The first example uses no
+random sampling, so identical inputs produce exactly identical histories:
+
+```bash
+cargo run --example vqe
 ```
 
 ## OpenQASM export
