@@ -259,6 +259,16 @@ cargo bench --bench parameterized_gate_bench
 See [`benches/README.md`](benches/README.md) for the benchmark groups,
 measurement boundaries and guidance for interpreting Criterion results.
 
+Run a deterministic, versioned research experiment:
+
+```bash
+cargo run --example reproducible_experiment -- \
+  experiments/fixtures/bell_state_probabilities.json
+```
+
+See [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md) for seeded stochastic
+experiments, JSON records, explicit tolerances and raw-data analysis.
+
 Check formatting without changing files:
 
 ```bash
@@ -272,6 +282,7 @@ required CI checks and the full pull request checklist.
 
 * [Architecture and implementation](docs/ARCHITECTURE.md)
 * [Development roadmap](docs/ROADMAP.md)
+* [Reproducible experiments](docs/EXPERIMENTS.md)
 * [Issue triage and label policy](docs/TRIAGE.md)
 * [External validation](validation)
 * [Contribution guide](CONTRIBUTING.md)

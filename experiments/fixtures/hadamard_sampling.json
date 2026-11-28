@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "experiment_id": "hadamard-seeded-sampling",
+  "fixture": "hadamard_sampling",
+  "parameters": {},
+  "seed": 12345,
+  "trials": 3,
+  "shots": 1024,
+  "tolerances": {
+    "absolute": 0.1,
+    "relative": 0.0
+  }
+}

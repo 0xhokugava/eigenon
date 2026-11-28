@@ -1,6 +1,7 @@
 pub mod circuit_demos;
 pub mod engine_verification;
 pub mod foundations;
+pub mod harness;
 
 pub fn run_all_verifications() {
     engine_verification::inplace_verification::run();

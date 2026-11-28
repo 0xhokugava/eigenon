@@ -69,6 +69,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
       - name: Run tests
         run: cargo test --verbose
+      - name: Run deterministic experiment smoke test
+        run: >-
+          cargo run --example reproducible_experiment --
+          experiments/fixtures/bell_state_probabilities.json
 
   qiskit-validation:
     runs-on: ubuntu-latest
