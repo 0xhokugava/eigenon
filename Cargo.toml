@@ -27,5 +27,9 @@ harness = false
 name = "cnot_bench"
 harness = false
 
+[[bench]]
+name = "parameterized_gate_bench"
+harness = false
+
 [dev-dependencies]
 insta = "1.48.0"

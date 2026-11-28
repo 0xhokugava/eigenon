@@ -250,6 +250,15 @@ Run benchmarks:
 cargo bench
 ```
 
+Run only the parameterized-gate benchmarks:
+
+```bash
+cargo bench --bench parameterized_gate_bench
+```
+
+See [`benches/README.md`](benches/README.md) for the benchmark groups,
+measurement boundaries and guidance for interpreting Criterion results.
+
 Check formatting without changing files:
 
 ```bash

@@ -34,6 +34,7 @@
 * [x] MCX and MCZ export (up to two controls in OpenQASM 2.0)
 * [x] Basic OpenQASM 2.0 import
 * [x] Parameterized Rx, Ry, Rz and U gates
+* [x] Dedicated parameterized-gate benchmark suite
 
 ## Current Focus
 
