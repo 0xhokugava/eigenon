@@ -36,6 +36,7 @@
 * [x] Parameterized Rx, Ry, Rz and U gates
 * [x] Dedicated parameterized-gate benchmark suite
 * [x] Reproducible experiment definitions and raw result records
+* [x] Named circuit parameters and deterministic numeric binding
 
 ## Current Focus
 

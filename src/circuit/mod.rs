@@ -7,3 +7,9 @@
 pub mod catalog;
 pub mod core;
 pub mod operation;
+pub mod parameterized;
+
+pub use parameterized::{
+    BindingError, Parameter, ParameterValue, ParameterizedCircuit, ParameterizedGateKind,
+    ParameterizedOperation,
+};
